@@ -1,0 +1,36 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  -webkit-user-select: none;
+}
+.now-playing {
+  font-weight: bold;
+}
+#progress {
+  position: absolute;
+  top: -1px;
+  width: 0;
+  height: 2px;
+  background: rgb(230, 32, 32);
+}
+#main {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 56px;
+  overflow-y: scroll;
+}
+#player {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 26px;
+  text-align: center;
+  background: white;
+  padding: 15px 0;
+  border-top: 1px solid #ccc;
+}

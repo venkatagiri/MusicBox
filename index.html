@@ -3,29 +3,23 @@
 <head>
   <meta charset=utf-8 />
   <title>DB Player</title>
-  <style>
-    html, body {
-      width: 100%;
-      height: 100%;
-      padding: 0;
-      margin: 0;
-      -webkit-user-select: none;
-    }
-    .now-playing {
-      font-weight: bold;
-    }
-    #progress {
-      width: 0;
-      height: 2px;
-      background: rgb(230, 32, 32);
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <h1>DB Player</h1>
   
-  <audio id="audio"></audio>
-  <div id="controls">
+  <div id="main">
+    <h1>DB Player</h1>
+
+    <ul id="songsList">
+      <li class="no-songs">No Songs</li>
+    </ul>
+  </div>
+
+  <div id="player">
+    <div id="progress"></div>
+
+    <audio id="audio"></audio>
+  	
     <button id="play">Play</button>
     <button id="pause">Pause</button>
     <button id="next">Next</button>
@@ -38,14 +32,10 @@
     </span>
   </div>
   
-  <div id="progress"></div>
-  
-  <ul id="songsList">
-    <li class="no-songs">No Songs</li>
-  </ul>
-  
   <script src="//cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.0/dropbox.min.js"></script>
-  <script src="id3.js"></script>
-  <script src="app.js"></script>
+  <script src="js/lib/lastfm.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/id3.js"></script>
+  <script src="js/player.js"></script>
 </body>
 </html>

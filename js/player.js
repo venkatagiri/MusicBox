@@ -1,18 +1,3 @@
-/* utils */
-function $(selector) { return document.querySelector(selector); }
-function pos(child) { for(var k=0,e=child; e.previousElementSibling; e = e.previousElementSibling, ++k); return k; }
-window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame;
-/* lightweight wrapper for localStorage, to allow object storage */
-var store = {
-  set: function(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
-  },
-  get: function(key) {
-    var value = localStorage.getItem(key);
-    return value && JSON.parse(value);
-  }
-};
-
 /* player */
 var player = (function() {
   var $audio = $('#audio'),
@@ -146,7 +131,7 @@ client.authenticate(function(error, client) {
   
   // Else search the DB
   console.time("search");
-  client.search("/", matchPattern, { limit: 999}, function(error, results) {
+  client.search("/Music", matchPattern, { limit: 999}, function(error, results) {
     console.timeEnd("search");
     if(error) return console.log(error);
 
