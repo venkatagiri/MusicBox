@@ -2,7 +2,7 @@
 var player = (function() {
   var $audio = $('#audio'),
     $list = $('#songsList'),
-    $progress = $('#progress'),
+    $progress = $('.progress'),
     songs = [],
     urlCache = [],
     current = -1,
@@ -115,7 +115,7 @@ var player = (function() {
   return {
     add: add,
     go: changeSong
-  }
+  };
 })();
 
 var client = new Dropbox.Client({ key: "rkii6jl2u8un1xc" }),

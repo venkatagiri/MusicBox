@@ -8,22 +8,27 @@ html, body {
 .now-playing {
   font-weight: bold;
 }
-#progress {
-  position: absolute;
-  top: -1px;
-  width: 0;
-  height: 2px;
-  background: rgb(230, 32, 32);
-}
-#main {
+header {
   position: absolute;
   top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+}
+h1 {
+  padding: 15px;
+  margin: 0;
+  color: #e62020;
+}
+section {
+  position: absolute;
+  top: 70px;
   left: 0;
   right: 0;
   bottom: 56px;
   overflow-y: scroll;
 }
-#player {
+.player {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -33,4 +38,12 @@ html, body {
   background: white;
   padding: 15px 0;
   border-top: 1px solid #ccc;
+}
+
+.progress {
+  position: absolute;
+  top: -1px;
+  width: 0;
+  height: 2px;
+  background: rgb(230, 32, 32);
 }
