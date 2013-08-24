@@ -15,5 +15,8 @@ var store = {
   get: function(key) {
     var value = localStorage.getItem(key);
     return value && JSON.parse(value);
+  },
+  remove: function(key) {
+    localStorage.removeItem(key);
   }
 };

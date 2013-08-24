@@ -1,40 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html data-ng-app="dbPlayer">
 <head>
   <meta charset=utf-8 />
   <title>DB Player</title>
+  <link rel="stylesheet" href="css/pure-min.css">
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="css/style.css" />
+  <script src="js/lib/angular.min.js"></script>
 </head>
 <body>
-  
-  <header>
-    <h1>DropBox Player</h1>
-  </header>
+  <div class="sidebar">
+    <header>
+      <h1 class="brand-title">Playa</h1>
+    </header>
 
-  <section>
-    <ul id="songsList">
-      <li class="no-songs">No Songs</li>
-    </ul>
+    <nav class="pure-menu pure-menu-open" id="nav">
+      <ul data-active-link="active">
+        <li><span class="pure-menu-heading">Library</span></li>
+        <li><a href="#/artists">Artists</a></li>
+        <li><a href="#/albums">Albums</a></li>
+        <li><a href="#/songs">Songs</a></li>
+        <li><a href="#/genres">Genres</a></li>
+        <li><a href="#/queue">Queue</a></li>
+        <li><span class="pure-menu-heading">Account</span></li>
+        <li><a href="#/build">Build Library</a></li>
+        <li><a href="#/logout">Logout</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <section data-ng-view>
   </section>
 
-  <div class="player">
-    <div class="progress"></div>
+  <div class="player" data-ng-controller="PlayerCtrl">
+    <div class="progress" style="width: {{progress}}%"></div>
 
-    <audio id="audio"></audio>
-  	
-    <button id="play">Play</button>
-    <button id="pause">Pause</button>
-    <button id="next">Next</button>
-    <button id="prev">Previous</button>
-    <button id="clear">Clear</button>
+    <audio src="{{src}}" autoplay></audio>
+
+    <button data-ng-click="play()" data-ng-show="!playing">Play</button>
+    <button data-ng-click="pause()" data-ng-show="playing">Pause</button>
+    <button data-ng-click="next()">Next</button>
+    <button data-ng-click="prev()">Previous</button>
+    <button data-ng-click="clear()">Clear</button>
     <span>
-      <button id="decrease">-</button>
-      <span id="volume">4</span>
-      <button id="increase">+</button>
+      <button data-ng-click="changeVolume(-1)">-</button>
+      <span>{{volume}}</span>
+      <button data-ng-click="changeVolume(+1)">+</button>
     </span>
   </div>
   
-  <script src="//cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.0/dropbox.min.js"></script>
+  <script type="text/ng-template" id="SongsView">
+    <table class="pure-table pure-table-horizontal">
+      <thead>
+        <tr><td>File Name</td></tr>
+      </thead>
+      <tbody>
+        <tr data-ng-repeat="song in songs" data-ng-dblclick="playSong()"><td>{{song.title}}</td></tr>
+        <tr data-ng-hide="songs.length"><td>No Songs</td></tr>
+      </tbody>
+    </table>
+  </script>
+
+  <script type="text/ng-template" id="AlbumsView">
+    <table class="pure-table pure-table-horizontal">
+      <thead>
+        <tr><td>Album Name</td></tr>
+      </thead>
+      <tbody>
+        <tr data-ng-repeat="album in albums" data-ng-dblclick="play(album)"><td>{{album.name}}</td></tr>
+        <tr data-ng-hide="albums.length"><td>No Albums</td></tr>
+      </tbody>
+    </table>
+  </script>
+
+  <script type="text/ng-template" id="ArtistsView">
+    <table class="pure-table pure-table-horizontal">
+      <thead>
+        <tr><td>Artist Name</td></tr>
+      </thead>
+      <tbody>
+        <tr data-ng-repeat="artist in artists" data-ng-dblclick="play(artist)"><td>{{artist.name}}</td></tr>
+        <tr data-ng-hide="artists.length"><td>No Artists</td></tr>
+      </tbody>
+    </table>
+  </script>
+
+  <script type="text/ng-template" id="GenresView">
+    <table class="pure-table pure-table-horizontal">
+      <thead>
+        <tr><td>Genre</td></tr>
+      </thead>
+      <tbody>
+        <tr data-ng-repeat="genre in genres" data-ng-dblclick=""><td>{{genre.name}}</td></tr>
+        <tr data-ng-show="genres"><td>No Genres</td></tr>
+      </tbody>
+    </table>
+  </script>
+
+  <script type="text/ng-template" id="QueueView">
+    <table class="pure-table pure-table-horizontal">
+      <thead>
+        <tr><td>File Name</td></tr>
+      </thead>
+      <tbody>
+        <tr data-ng-repeat="song in songs" data-ng-dblclick="playSong()" data-ng-class="{selected: $index==nowPlaying}"><td>{{song.name}}</td></tr>
+        <tr data-ng-show="!songs.length"><td>No Songs</td></tr>
+      </tbody>
+    </table>
+  </script>
+
+  <script type="text/ng-template" id="LoginView">
+    <button class="pure-button pure-button-primary" data-ng-click="login()">Login to Dropbox</button>
+    <p data-ng-show="loggingIn">Logging In...</p>
+    <p data-ng-show="error">Login Failed. Reason: {{error}}</p>
+  </script>
+  
+  <script type="text/ng-template" id="BuildLibraryView">
+    <button class="pure-button pure-button-primary" data-ng-click="build()">Build the Library</button>
+    <p data-ng-show="msg">{{msg}} {{done}}/{{total}}</p>
+  </script>
+
+  <script src="js/lib/dropbox-0.10.0.min.js"></script>
   <script src="js/lib/lastfm.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/id3.js"></script>

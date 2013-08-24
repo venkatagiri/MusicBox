@@ -1,35 +1,57 @@
-html, body {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0;
+body {
+  font-family: 'Open Sans', sans-serif;
+  color: #333;
+  background: #eee;
   -webkit-user-select: none;
 }
-.now-playing {
-  font-weight: bold;
+a {
+  text-decoration: none;
+  color: #1b98f8;
 }
-header {
-  position: absolute;
+/* Layout */
+h1 {
+  margin: 100px 0 20px 0;
+  padding: 0 20px;
+  color: #fff;
+  background: #e62020;
+  text-transform: uppercase;
+}
+.sidebar {
+  position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  height: 70px;
+  bottom: 56px;
+  width: 200px;
+  background: #fff;
+  border-right: 1px solid #ccc;
 }
-h1 {
-  padding: 15px;
-  margin: 0;
-  color: #e62020;
+#nav {
+  background: transparent;
+  border: 0;
+  text-align: left;
+}
+#nav a {
+  margin-bottom: 1px;
+}
+#nav a:hover, #nav a.active {
+  background: #eee;
+}
+#nav .pure-menu-heading {
+  border-bottom: 0;
+  font-size: 100%;
+  color: rgb(75, 113, 151);
 }
 section {
-  position: absolute;
-  top: 70px;
-  left: 0;
-  right: 0;
+  position: fixed;
+  top: 0;
+  left: 200px;
   bottom: 56px;
-  overflow-y: scroll;
+  right: 0px;
+  padding: 20px;
+  overflow: auto;
 }
 .player {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
@@ -46,4 +68,7 @@ section {
   width: 0;
   height: 2px;
   background: rgb(230, 32, 32);
+}
+.selected {
+  font-weight: bold;
 }
