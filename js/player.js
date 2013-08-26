@@ -14,12 +14,12 @@ angular
   })
   .directive("activeLink", function($location) {
     return {
-      restrict: 'A',
+      restrict: "A",
       link: function(scope, element, attrs, controller) {
         var klass = attrs.activeLink,
           links = element[0].getElementsByTagName("a");
         scope.location = $location;
-        scope.$watch('location.path()', function(newPath) {
+        scope.$watch("location.path()", function(newPath) {
           for(var i=0, len=links.length; i < len; i++) {
             if(links[i].hash.substring(1) == newPath) links[i].classList.add(klass);
             else links[i].classList.remove(klass);
@@ -31,79 +31,98 @@ angular
  .run(function($rootScope, $location, dropbox) {
     $rootScope.$on("$locationChangeStart", function(event, next, current) {
       if(!dropbox.isLoggedIn()) {
-        if (next.split('#')[1] !== "/login") {
+        if (next.split("#")[1] !== "/login") {
           $location.path("/login");
         }
-      } else if(next.split('#')[1] === "/login") {
+      } else if(next.split("#")[1] === "/login") {
         $location.path("/songs");
       }
     });
   })
-  .service("library", function() {
-    var _library = store.get("library") || {
-      songs: {},
-      albums: {},
-      artists: {},
-      genres: {}
-    };
+  .service("library", function($rootScope) {
+    var datastore = false,
+      songs, albums, artists, genres;
     
     var _addSong = function(songKey, url) {
       ID3.loadTags(url, function() {
         var tags = ID3.getAllTags(url);
         
-        // Albums
-        if(!_library.albums[tags.album]) {
-          _library.albums[tags.album] = {
-            name: tags.album,
-            artist: tags.artist,
-            songs: []
-          };
-        }
-        _library.albums[tags.album].songs.push(songKey);
-        
-        // Artists
-        if(!_library.artists[tags.artist]) {
-          _library.artists[tags.artist] = {
-            name: tags.artist,
-            albums: []
-          };
-        }
-        _library.artists[tags.artist].albums.push(tags.album);
-        
-        // Genres
-        if(!_library.genres[tags.genre]) {
-          _library.genres[tags.genre] = {
-            name: tags.genre,
-            albums: []
-          };
-        }
-        _library.genres[tags.genre].albums.push(tags.album);
-        
         // Songs
-        _library.songs[songKey] = {
-          title: tags.title,
+        var song = songs.insert({
+          name: tags.title,
           album: tags.album,
           artist: tags.artist,
           genre: tags.genre
-        };
+        });
+
+        // Albums
+        var album = albums.query({name: tags.album})[0];
+        if(!album) {
+          album = albums.insert({
+            name: tags.album,
+            artist: tags.artist,
+            songs: []
+          });
+        }
+        album.get('songs').push(song.getId());
+        
+        // Artists
+        var artist = artists.query({name: tags.artist})[0];
+        if(!artist) {
+          artist = artists.insert({
+            name: tags.artist,
+            albums: []
+          });
+        }
+        artist.get('albums').push(tags.album);
+        
+        // Genres
+        var genre = genres.query({name: tags.genre})[0];
+        if(!genre) {
+          genre = genres.insert({
+            name: tags.genre,
+            albums: []
+          });
+        }
+        genre.get('albums').push(tags.album);
       }, { tags: ["artist", "title", "album", "genre"] });
     };
     
     return {
       add: _addSong,
-      songs: function() { return _library.songs; },
-      artists: function() { return _library.artists; },
-      albums: function() { return _library.albums; },
-      genres: function() { return _library.genres; },
-      save: function() { store.set("library", _library); }
+      setDatastore: function(ds) {
+        window.ds = datastore = ds;
+        songs = datastore.getTable("songs");
+        artists = datastore.getTable("artists");
+        albums = datastore.getTable("albums");
+        genres = datastore.getTable("genres");
+        $rootScope.$broadcast("datastore.loaded");
+      },
+      songs: function() { return datastore ? songs.query() : {}; },
+      artists: function() { return datastore ? artists.query() : {}; },
+      albums: function() { return datastore ? albums.query() : {}; },
+      genres: function() { return datastore ? genres.query() : {}; }
     };
   })
   .service("dropbox", function($rootScope, library) {
     var client = new Dropbox.Client({ key: "rkii6jl2u8un1xc" });
     client.authDriver(new Dropbox.AuthDriver.Popup({
-      receiverUrl: "https://c9.io/venkatagiri/tlf/workspace/Dropbox/Projects/db-player/oauth_receiver.html"
+      // receiverUrl: "https://c9.io/venkatagiri/tlf/workspace/Dropbox/Projects/db-player/oauth_receiver.html"
+      receiverUrl: "https://tlfx.tk/db-player/oauth_receiver.html"
     }));
-    client.authenticate({interactive: false});
+    client.authenticate({interactive: false}, function() {
+      if(!client.isAuthenticated()) return;
+
+      var datastoreManager = client.getDatastoreManager();
+      datastoreManager.openDefaultDatastore(function (error, datastore) {
+          if (error) {
+            console.log(error);
+            alert("Error opening default datastore: " + error);
+            return;
+          }
+          library.setDatastore(datastore);
+      });
+    });
 
     return {
       isLoggedIn: function() {
@@ -120,8 +139,17 @@ angular
                 client.reset();
                 return callback(error.description.replace(/\+/g, " "));
               }
-              store.set("loggedin", true);
-              callback(null);
+
+              var datastoreManager = client.getDatastoreManager();
+              datastoreManager.openDefaultDatastore(function (error, datastore) {
+                  if (error) {
+                    console.log(error);
+                    return callback(error.description.replace(/\+/g, " "));
+                  }
+                  library.setDatastore(datastore);
+                  store.set("loggedin", true);
+                  callback(null);
+              });
             });
           }
         });
@@ -140,6 +168,7 @@ angular
       },
       buildLibrary: function(callback) {
         var _this = this;
+        
         this._search(function(error, files) {
           if(error) return callback(error);
           
@@ -147,20 +176,11 @@ angular
           _this._getUrls(files, function(error) {
             callback(error);
           });
-          (function check() {
-            if(Object.keys(library.songs()).length === totalSongs) {
-              console.log("Library is done!");
-              library.save();
-              return callback("Done! "+totalSongs+" songs loaded!");
-            }
-            callback("Loading... "+Object.keys(library.songs()).length+"/"+files.length);
-            setTimeout(check, 50);
-          })();
         });
       },
       _search: function(callback) {
         if(store.get("library.files")) return callback(null, store.get("library.files"));
-        client.search("/Music", "mp3", {limit: 10}, function(error, files) {
+        client.search("/Music", "mp3", {limit: 1}, function(error, files) {
           if(error) {
             console.log(error);
             return callback(error);
@@ -228,6 +248,17 @@ angular
       }
     };
   })
+  .controller("MainCtrl", function($scope, $location, dropbox) {
+    if(dropbox.isLoggedIn()) {
+      $scope.$on("datastore.loaded",  function() {
+        document.body.classList.remove("loading");
+        $location.path("/login");
+      });
+    } else {
+      document.body.classList.remove("loading");
+      $location.path("/login");
+    }
+  })
   .controller("LoginCtrl", function($scope, $location, dropbox) {
     $scope.login = function() {
       $scope.loggingIn = true;
@@ -260,7 +291,7 @@ angular
     };
   })
   .controller("PlayerCtrl", function($scope, $timeout, playlist) {
-    $scope.audio = $('audio');
+    $scope.audio = $("audio");
     $scope.volume = 4;
     $scope.audio.volume = $scope.volume * 0.1;
     $scope.src = "";
@@ -316,8 +347,8 @@ angular
       $timeout(update, 30);
     })();
     
-    $scope.audio.addEventListener('ended', function() { $scope.next(); }, false);
-    document.addEventListener('keypress', function(e) {
+    $scope.audio.addEventListener("ended", function() { $scope.next(); }, false);
+    document.addEventListener("keypress", function(e) {
       if([32, 37, 39].indexOf(e.keyCode) > -1) e.preventDefault();
       if(e.keyCode == 32) {
         if($scope.audio.paused) $scope.play();

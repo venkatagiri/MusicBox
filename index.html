@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="css/style.css" />
   <script src="js/lib/angular.min.js"></script>
 </head>
-<body>
+<body class="loading" data-ng-controller="MainCtrl">
   <div class="sidebar">
     <header>
       <h1 class="brand-title">Playa</h1>
@@ -55,7 +55,7 @@
         <tr><td>File Name</td></tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="song in songs" data-ng-dblclick="playSong()"><td>{{song.title}}</td></tr>
+        <tr data-ng-repeat="song in songs" data-ng-dblclick="playSong()"><td>{{song.get("name")}}</td></tr>
         <tr data-ng-hide="songs.length"><td>No Songs</td></tr>
       </tbody>
     </table>
@@ -67,7 +67,7 @@
         <tr><td>Album Name</td></tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="album in albums" data-ng-dblclick="play(album)"><td>{{album.name}}</td></tr>
+        <tr data-ng-repeat="album in albums" data-ng-dblclick="play(album)"><td>{{album.get("name")}}</td></tr>
         <tr data-ng-hide="albums.length"><td>No Albums</td></tr>
       </tbody>
     </table>
@@ -79,7 +79,7 @@
         <tr><td>Artist Name</td></tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="artist in artists" data-ng-dblclick="play(artist)"><td>{{artist.name}}</td></tr>
+        <tr data-ng-repeat="artist in artists" data-ng-dblclick="play(artist)"><td>{{artist.get("name")}}</td></tr>
         <tr data-ng-hide="artists.length"><td>No Artists</td></tr>
       </tbody>
     </table>
@@ -91,8 +91,8 @@
         <tr><td>Genre</td></tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="genre in genres" data-ng-dblclick=""><td>{{genre.name}}</td></tr>
-        <tr data-ng-show="genres"><td>No Genres</td></tr>
+        <tr data-ng-repeat="genre in genres" data-ng-dblclick=""><td>{{genre.get("name")}}</td></tr>
+        <tr data-ng-hide="genres.length"><td>No Genres</td></tr>
       </tbody>
     </table>
   </script>
@@ -121,9 +121,10 @@
   </script>
 
   <script src="js/lib/dropbox-0.10.0.min.js"></script>
+  <script src="js/lib/dropbox-datastores-0.1.0-b3.js"></script>
   <script src="js/lib/lastfm.js"></script>
+  <script src="js/lib/id3.min.js"></script>
   <script src="js/utils.js"></script>
-  <script src="js/id3.js"></script>
   <script src="js/player.js"></script>
 </body>
 </html>
