@@ -189,16 +189,14 @@ app.service("dropbox", function($rootScope, library) {
       });
     },
     _search: function(callback) {
-      if(store.get("library.files")) return callback(null, store.get("library.files"));
-      client.search("/Music", "mp3", {limit: 1}, function(error, files) {
+      client.search("/Music", "mp3", {limit: 49}, function(error, files) {
         if(error) {
           console.log(error);
           return callback(error);
         }
         
-        store.set("library.files", files);
         console.log("Found", files.length, "songs");
-        callback(null, store.get("library.files"));
+        callback(null, files);
       });
     },
     _getUrls: function(files, callback) {
@@ -212,13 +210,12 @@ app.service("dropbox", function($rootScope, library) {
           console.log(error);
           return callback(error);
         }
-        console.log("File:", file.path);
         library.add(file.path, details.url);
       });
       this._getUrls(files, callback);
     }
   };
-})
+});
 
 // Playlist Service
 app.service("playlist", function($rootScope) {
