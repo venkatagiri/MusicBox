@@ -13,7 +13,7 @@ app.config(function($routeProvider) {
   .when("/genres", { templateUrl: "GenresView", controller: "GenresCtrl" })
   .when("/queue", { templateUrl: "QueueView", controller: "QueueCtrl" })
   .otherwise({redirectTo: "/login"});
-})
+});
 
 // Directive for highlighting the active nav link
 app.directive("activeLink", function($location) {
@@ -51,7 +51,7 @@ app.service("library", function($rootScope) {
   var datastore = false,
     songs, albums, artists, genres;
   
-  var _addSong = function(songKey, url) {
+  var _addSong = function(path, url) {
     ID3.loadTags(url, function() {
       var tags = ID3.getAllTags(url);
       
@@ -60,7 +60,8 @@ app.service("library", function($rootScope) {
         name: tags.title,
         album: tags.album,
         artist: tags.artist,
-        genre: tags.genre
+        genre: tags.genre,
+        path: path
       });
 
       // Albums
@@ -213,6 +214,13 @@ app.service("dropbox", function($rootScope, library) {
         library.add(file.path, details.url);
       });
       this._getUrls(files, callback);
+    },
+    getUrl: function(path, callback) {
+      client.makeUrl(path, {download: true}, callback);
+    },
+    reset: function(callback) {
+      var datastoreManager = client.getDatastoreManager();
+      datastoreManager.deleteDatastore("default", callback);
     }
   };
 });
@@ -300,8 +308,17 @@ app.controller("BuildLibraryCtrl", function($scope, dropbox) {
       $scope.msg = msg;
     });
   };
+
+  $scope.reset = function() {
+    $scope.reset_msg = "Resetting...";
+    dropbox.reset(function(error) {
+      if(error) $scope.reset_msg = msg;
+      else $scope.reset_msg = "Reset Complete!";
+    });
+  };
+
 });
-app.controller("PlayerCtrl", function($scope, $timeout, playlist) {
+app.controller("PlayerCtrl", function($scope, $timeout, playlist, dropbox) {
   $scope.audio = $("audio");
   $scope.volume = 4;
   $scope.audio.volume = $scope.volume * 0.1;
@@ -334,11 +351,11 @@ app.controller("PlayerCtrl", function($scope, $timeout, playlist) {
     console.log("Current Song:", song);
     
     $scope.pause();
-    if(!urlCache[song.path]) {
-      client.makeUrl(song.path, { download: true }, function(error, details) {
+    if(!urlCache[song.get('path')]) {
+      dropbox.getUrl(song.get('path'), function(error, details) {
         if(error) return console.log(error);
         
-        $scope.src = urlCache[song.path] = details.url;
+        $scope.src = urlCache[song.get('path')] = details.url;
         $scope.play();
       });
     } else {

@@ -103,8 +103,8 @@
         <tr><td>File Name</td></tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="song in songs" data-ng-dblclick="playSong()" data-ng-class="{selected: $index==nowPlaying}"><td>{{song.name}}</td></tr>
-        <tr data-ng-show="!songs.length"><td>No Songs</td></tr>
+        <tr data-ng-repeat="song in songs" data-ng-dblclick="playSong()" data-ng-class="{selected: $index==nowPlaying}"><td>{{song.get("name")}}</td></tr>
+        <tr data-ng-hide="songs.length"><td>No Songs</td></tr>
       </tbody>
     </table>
   </script>
@@ -118,6 +118,9 @@
   <script type="text/ng-template" id="BuildLibraryView">
     <button class="pure-button pure-button-primary" data-ng-click="build()">Build the Library</button>
     <p data-ng-show="msg">{{msg}} {{done}}/{{total}}</p>
+
+    <button class="pure-button pure-button-primary" data-ng-click="reset()">Reset</button>
+    <p data-ng-show="reset_msg">{{reset_msg}}</p>
   </script>
 
   <script src="js/lib/dropbox-0.10.0.min.js"></script>
