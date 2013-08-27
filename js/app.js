@@ -283,9 +283,9 @@ app.controller("LoginCtrl", function($scope, $location, dropbox) {
     $scope.loggingIn = true;
     $scope.error = "";
     dropbox.login(function(error) {
-      console.log(error);
       $scope.loggingIn = false;
       if(error) {
+        console.log(error);
         $scope.error = error;
       } else {
         $location.path("/songs");
