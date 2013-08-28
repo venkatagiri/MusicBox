@@ -190,7 +190,7 @@ app.service("dropbox", function($rootScope, library) {
       });
     },
     _search: function(callback) {
-      client.search("/Music", "mp3", {limit: 49}, function(error, files) {
+      client.search("/Music", "mp3", {limit: 999}, function(error, files) {
         if(error) {
           console.log(error);
           return callback(error);
