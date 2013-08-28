@@ -418,9 +418,6 @@ app.controller("QueueCtrl", function($scope, playlist) {
   $scope.nowPlaying = playlist.index();
 
   $scope.playSong = function() {
-    console.log("Queue scope:", $scope);
-    playlist.clear();
-    playlist.add($scope.songs);
     playlist.play(this.$index);
   };
   $scope.$on("song.change", function() {
