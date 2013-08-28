@@ -39,7 +39,7 @@ h1 {
 #nav .pure-menu-heading {
   border-bottom: 0;
   font-size: 100%;
-  color: rgb(75, 113, 151);
+  color: #e62020;
 }
 section {
   position: fixed;
@@ -58,6 +58,7 @@ body.loading::after {
   right: 0;
   top: 0;
   bottom: 0;
+  z-index: 999;
   background: rgba(255, 255, 255, 0.8) url(../img/loading.gif) center center no-repeat;
 }
 
