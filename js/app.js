@@ -312,8 +312,12 @@ app.controller("BuildLibraryCtrl", function($scope, dropbox) {
   $scope.reset = function() {
     $scope.reset_msg = "Resetting...";
     dropbox.reset(function(error) {
-      if(error) $scope.reset_msg = msg;
-      else $scope.reset_msg = "Reset Complete!";
+      if(error) {
+        $scope.reset_msg = msg;
+      } else {
+        $scope.reset_msg = "Reset Complete! Refreshing now...";
+        location.reload();
+      }
     });
   };
 
