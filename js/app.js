@@ -124,8 +124,7 @@ app.service("dropbox", function($rootScope, library) {
   client.authenticate({interactive: false}, function() {
     if(!client.isAuthenticated()) return;
 
-    var datastoreManager = client.getDatastoreManager();
-    datastoreManager.openDefaultDatastore(function (error, datastore) {
+    client.getDatastoreManager().openDefaultDatastore(function (error, datastore) {
         if (error) {
           console.log(error);
           alert("Error opening default datastore: " + error);
@@ -151,8 +150,7 @@ app.service("dropbox", function($rootScope, library) {
               return callback(error.description.replace(/\+/g, " "));
             }
 
-            var datastoreManager = client.getDatastoreManager();
-            datastoreManager.openDefaultDatastore(function (error, datastore) {
+            client.getDatastoreManager().openDefaultDatastore(function (error, datastore) {
                 if (error) {
                   console.log(error);
                   return callback(error.description.replace(/\+/g, " "));
@@ -219,8 +217,7 @@ app.service("dropbox", function($rootScope, library) {
       client.makeUrl(path, {download: true}, callback);
     },
     reset: function(callback) {
-      var datastoreManager = client.getDatastoreManager();
-      datastoreManager.deleteDatastore("default", callback);
+      client.getDatastoreManager().deleteDatastore("default", callback);
     }
   };
 });
