@@ -1,56 +1,8 @@
 body {
   font-family: 'Open Sans', sans-serif;
   color: #333;
-  background: #eee;
   -webkit-user-select: none;
 }
-a {
-  text-decoration: none;
-  color: #1b98f8;
-}
-/* Layout */
-h1 {
-  margin: 100px 0 20px 0;
-  padding: 0 20px;
-  color: #fff;
-  background: #e62020;
-  text-transform: uppercase;
-}
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 56px;
-  width: 200px;
-  background: #fff;
-  border-right: 1px solid #ccc;
-}
-#nav {
-  background: transparent;
-  border: 0;
-  text-align: left;
-}
-#nav a {
-  margin-bottom: 1px;
-}
-#nav a:hover, #nav a.active {
-  background: #eee;
-}
-#nav .pure-menu-heading {
-  border-bottom: 0;
-  font-size: 100%;
-  color: #e62020;
-}
-section {
-  position: fixed;
-  top: 0;
-  left: 200px;
-  bottom: 56px;
-  right: 0px;
-  padding: 20px;
-  overflow: auto;
-}
-
 body.loading::after {
   content: '';
   position: absolute;
@@ -61,17 +13,120 @@ body.loading::after {
   z-index: 999;
   background: rgba(255, 255, 255, 0.8) url(../img/loading.gif) center center no-repeat;
 }
+a {
+  text-decoration: none;
+  color: #1b98f8;
+}
 
+/* Header */
+header {
+  height: 55px;
+}
+h1 {
+  display: inline-block;
+  width: 160px;
+  height: 45px;
+  margin: 0;
+  padding: 5px 20px;
+  color: #fff;
+  background: #e62020;
+  font-weight: normal;
+}
+h2 {
+  font-weight: normal;
+  margin: 0 0 10px 0;
+}
+h3 {
+  font-weight: normal;
+}
+
+/* Navigation */
+#nav {
+  position: fixed;
+  top: 55px;
+  left: 0;
+  bottom: 60px;
+  width: 200px;
+  background: #fff;
+  border: 0;
+  text-align: left;
+}
+#nav a {
+  margin-bottom: 1px;
+}
+#nav a:hover, #nav a.active {
+  background: #eee;
+}
+#nav .pure-menu-heading {
+  margin: 0;
+  padding-top: 15px;
+  border-bottom: 0;
+  font-size: 100%;
+  color: #e62020;
+}
+
+/* Main Content */
+.content {
+  position: fixed;
+  top: 0;
+  left: 200px;
+  bottom: 60px;
+  right: 0;
+  padding: 20px;
+  background: #f0f0f0;
+  overflow: auto;
+}
+
+/* The Player */
 .player {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 26px;
-  text-align: center;
+  height: 59px;
   background: white;
-  padding: 15px 0;
+  padding: 0;
   border-top: 1px solid #ccc;
+}
+.controls {
+  float: left;
+  width: 200px;
+  text-align: center;
+  padding-top: 2px;
+}
+.ctrl-btn {
+  width: 54px;
+  height: 54px;
+  border: none;
+  background: no-repeat url(../img/controls.png);
+  outline: none;
+}
+.ctrl-btn:hover {
+  background-color: #ddd;
+}
+.ctrl-btn-play {
+  background-position: 0 0;
+}
+.ctrl-btn-pause {
+  background-position: -54px 0;
+}
+.ctrl-btn-prev {
+  background-position: -108px 0;
+}
+.ctrl-btn-next {
+  background-position: -162px 0;
+}
+
+.current-song {
+  float: left;
+  width: 230px;
+  padding: 10px;
+}
+.current-song div[data-col=name] {
+  font-weight: bold;
+}
+.current-song div[data-col=artist] {
+  font-size: .9em;
 }
 
 .progress {
@@ -79,21 +134,44 @@ body.loading::after {
   top: -1px;
   width: 0;
   height: 2px;
-  background: rgb(230, 32, 32);
+  background: #e62020;
 }
-.selected {
-  font-weight: bold;
+.volume {
+  float: left;
+  padding: 15px;
 }
 
+/* Songs List */
 .pure-table {
   width: 100%;
+  border: 0;
 }
 .pure-table thead {
   text-transform: uppercase;
+  font-size: .9em;
+  color: #e62020;
+  background: none;
+}
+.pure-table thead tr {
+  border: 0;
+}
+.pure-table tbody tr {
+  border: 0;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+.pure-table tbody tr:hover {
+  background: #fff;
+}
+.pure-table td {
+  border: 0;
 }
 .pure-table [data-col=artist], .pure-table [data-col=album] {
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.pure-table .selected {
+  background: #f7f7f7;
 }

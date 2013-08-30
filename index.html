@@ -9,54 +9,57 @@
   <script src="js/lib/angular.min.js"></script>
 </head>
 <body class="loading" data-ng-controller="MainCtrl">
-  <div class="sidebar">
-    <header>
-      <h1 class="brand-title">Playa</h1>
-    </header>
+  <header>
+    <h1 class="brand-title">Music</h1>
+  </header>
 
-    <nav class="pure-menu pure-menu-open" id="nav">
-      <ul data-active-link="active">
-        <li><span class="pure-menu-heading">Library</span></li>
-        <li><a href="#/artists">Artists</a></li>
-        <li><a href="#/albums">Albums</a></li>
-        <li><a href="#/songs">Songs</a></li>
-        <li><a href="#/genres">Genres</a></li>
-        <li><a href="#/queue">Queue</a></li>
-        <li>
-          <form class="pure-form" data-ng-submit="search()">
-            <input type="text" placeholder="Search.." data-ng-model="query" data-ng-trim="false" />
-          </form>
-        </li>
-        <li><span class="pure-menu-heading">Account</span></li>
-        <li><a href="#/build">Build Library</a></li>
-        <li><a href="#/logout">Logout</a></li>
-      </ul>
-    </nav>
+  <nav class="pure-menu pure-menu-open" id="nav">
+    <ul data-active-link="active">
+      <li><span class="pure-menu-heading">Library</span></li>
+      <li><a href="#/artists">Artists</a></li>
+      <li><a href="#/albums">Albums</a></li>
+      <li><a href="#/songs">Songs</a></li>
+      <li><a href="#/genres">Genres</a></li>
+      <li><a href="#/queue">Queue</a></li>
+      <li>
+        <form class="pure-form" data-ng-submit="search()">
+          <input type="text" placeholder="Search.." data-ng-model="query" data-ng-trim="false" />
+        </form>
+      </li>
+      <li><span class="pure-menu-heading">Account</span></li>
+      <li><a href="#/build">Build Library</a></li>
+      <li><a href="#/logout">Logout</a></li>
+    </ul>
+  </nav>
+
+  <div data-ng-view class="content">
   </div>
 
-  <section data-ng-view>
-  </section>
-
   <div class="player" data-ng-controller="PlayerCtrl">
-    <div class="progress" style="width: {{progress}}%"></div>
-
     <audio src="{{src}}" autoplay></audio>
 
-    <button data-ng-click="play()" data-ng-show="!playing">Play</button>
-    <button data-ng-click="pause()" data-ng-show="playing">Pause</button>
-    <button data-ng-click="next()">Next</button>
-    <button data-ng-click="prev()">Previous</button>
-    <button data-ng-click="clear()">Clear</button>
-    <span>
+    <div class="controls">
+      <button data-ng-click="prev()" class="ctrl-btn ctrl-btn-prev"></button>
+      <button data-ng-click="play()" data-ng-show="!playing" class="ctrl-btn ctrl-btn-play"></button>
+      <button data-ng-click="pause()" data-ng-show="playing" class="ctrl-btn ctrl-btn-pause"></button>
+      <button data-ng-click="next()" class="ctrl-btn ctrl-btn-next"></button>
+    </div>
+    <div class="current-song">
+      <div data-col="name">{{song.get("name")}}</div>
+      <div data-col="artist">{{song.get("artist")}}</div>
+    </div>
+    <div class="progress" style="width: {{progress}}%"></div>
+    <div class="volume">
       <button data-ng-click="changeVolume(-1)">-</button>
       <span>{{volume}}</span>
       <button data-ng-click="changeVolume(+1)">+</button>
-    </span>
+    </div>
   </div>
   
   <script type="text/ng-template" id="SongsView">
     <h2>Songs</h2>
-    <table class="pure-table pure-table-horizontal">
+    <p data-ng-show="!songs.length">No Songs</p>
+    <table class="pure-table pure-table-horizontal" data-ng-show="songs.length">
       <thead>
         <tr>
           <td data-col="name">Name</td>
@@ -70,7 +73,6 @@
           <td data-col="artist">{{song.get("artist")}}</td>
           <td data-col="album">{{song.get("album")}}</td>
         </tr>
-        <tr data-ng-hide="songs.length"><td>No Songs</td></tr>
       </tbody>
     </table>
   </script>
@@ -113,7 +115,8 @@
 
   <script type="text/ng-template" id="QueueView">
     <h2>Queue</h2>
-    <table class="pure-table pure-table-horizontal">
+    <p data-ng-show="!songs.length">The queue is currently empty</p>
+    <table class="pure-table pure-table-horizontal" data-ng-show="songs.length">
       <thead>
         <tr>
           <td data-col="name">Name</td>
@@ -127,13 +130,12 @@
           <td data-col="artist">{{song.get("artist")}}</td>
           <td data-col="album">{{song.get("album")}}</td>
         </tr>
-        <tr data-ng-hide="songs.length"><td>The queue is currently empty</td></tr>
       </tbody>
     </table>
   </script>
 
   <script type="text/ng-template" id="SearchView">
-    <p data-ng-show="!songs.length">No Results</p>
+    <p data-ng-show="!songs.length">No results found</p>
     <div class="results">
       <div data-ng-include="'SongsView'" data-ng-show="songs.length"></div>
     </div>

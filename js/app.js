@@ -366,9 +366,10 @@ app.controller("PlayerCtrl", function($scope, $timeout, playlist, dropbox) {
   
   $scope.$on("song.change",  function() {
     var song = playlist.currentSong();
-    console.log("Current Song:", song);
+    console.log("Current Song:", song.get("name"));
     
     $scope.pause();
+    $scope.song = song;
     if(!urlCache[song.get('path')]) {
       dropbox.getUrl(song.get('path'), function(error, details) {
         if(error) return console.log(error);
