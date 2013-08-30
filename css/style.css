@@ -84,3 +84,16 @@ body.loading::after {
 .selected {
   font-weight: bold;
 }
+
+.pure-table {
+  width: 100%;
+}
+.pure-table thead {
+  text-transform: uppercase;
+}
+.pure-table [data-col=artist], .pure-table [data-col=album] {
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

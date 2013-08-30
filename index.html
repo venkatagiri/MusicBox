@@ -50,12 +50,21 @@
   </div>
   
   <script type="text/ng-template" id="SongsView">
+    <h2>Songs</h2>
     <table class="pure-table pure-table-horizontal">
       <thead>
-        <tr><td>File Name</td></tr>
+        <tr>
+          <td data-col="name">Name</td>
+          <td data-col="artist">Artist</td>
+          <td data-col="album">Album</td>
+        </tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="song in songs" data-ng-dblclick="playSong()"><td>{{song.get("name")}}</td></tr>
+        <tr data-ng-repeat="song in songs" data-ng-dblclick="playSong()">
+          <td data-col="name">{{song.get("name")}}</td>
+          <td data-col="artist">{{song.get("artist")}}</td>
+          <td data-col="album">{{song.get("album")}}</td>
+        </tr>
         <tr data-ng-hide="songs.length"><td>No Songs</td></tr>
       </tbody>
     </table>
