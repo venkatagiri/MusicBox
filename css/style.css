@@ -1,6 +1,7 @@
 body {
   font-family: 'Open Sans', sans-serif;
   color: #333;
+  background: #f0f0f0;
   -webkit-user-select: none;
 }
 body.loading::after {
@@ -20,12 +21,13 @@ a {
 
 /* Header */
 header {
-  height: 55px;
+  height: 54px;
+  border-bottom: 1px solid #ddd;
 }
 h1 {
-  display: inline-block;
+  float: left;
   width: 160px;
-  height: 45px;
+  height: 44px;
   margin: 0;
   padding: 5px 20px;
   color: #fff;
@@ -40,15 +42,24 @@ h3 {
   font-weight: normal;
 }
 
+.search-form {
+  padding: 10px 0 0 220px;
+}
+.search-form input {
+  max-width: 400px;
+  border-radius: 0 !important;
+}
+
 /* Navigation */
 #nav {
   position: fixed;
   top: 55px;
   left: 0;
   bottom: 60px;
-  width: 200px;
+  width: 199px;
   background: #fff;
   border: 0;
+  border-right: 1px solid #ddd;
   text-align: left;
 }
 #nav a {
@@ -68,12 +79,11 @@ h3 {
 /* Main Content */
 .content {
   position: fixed;
-  top: 0;
+  top: 55px;
   left: 200px;
   bottom: 60px;
   right: 0;
   padding: 20px;
-  background: #f0f0f0;
   overflow: auto;
 }
 

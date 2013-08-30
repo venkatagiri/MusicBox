@@ -2,7 +2,7 @@
 <html data-ng-app="app">
 <head>
   <meta charset=utf-8 />
-  <title>DB Player</title>
+  <title>DB Music</title>
   <link rel="stylesheet" href="css/pure-min.css">
   <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="css/style.css" />
@@ -10,7 +10,10 @@
 </head>
 <body class="loading" data-ng-controller="MainCtrl">
   <header>
-    <h1 class="brand-title">Music</h1>
+    <h1 class="brand-title">DB Music</h1>
+    <form class="pure-form search-form" data-ng-submit="search()">
+      <input class="pure-input-2-3" type="text" placeholder="Search music.." data-ng-model="query" data-ng-trim="false" />
+    </form>
   </header>
 
   <nav class="pure-menu pure-menu-open" id="nav">
@@ -21,11 +24,6 @@
       <li><a href="#/songs">Songs</a></li>
       <li><a href="#/genres">Genres</a></li>
       <li><a href="#/queue">Queue</a></li>
-      <li>
-        <form class="pure-form" data-ng-submit="search()">
-          <input type="text" placeholder="Search.." data-ng-model="query" data-ng-trim="false" />
-        </form>
-      </li>
       <li><span class="pure-menu-heading">Account</span></li>
       <li><a href="#/build">Build Library</a></li>
       <li><a href="#/logout">Logout</a></li>
@@ -38,21 +36,21 @@
   <div class="player" data-ng-controller="PlayerCtrl">
     <audio src="{{src}}" autoplay></audio>
 
+    <div class="progress" style="width: {{progress}}%"></div>
     <div class="controls">
       <button data-ng-click="prev()" class="ctrl-btn ctrl-btn-prev"></button>
       <button data-ng-click="play()" data-ng-show="!playing" class="ctrl-btn ctrl-btn-play"></button>
       <button data-ng-click="pause()" data-ng-show="playing" class="ctrl-btn ctrl-btn-pause"></button>
       <button data-ng-click="next()" class="ctrl-btn ctrl-btn-next"></button>
     </div>
-    <div class="current-song">
-      <div data-col="name">{{song.get("name")}}</div>
-      <div data-col="artist">{{song.get("artist")}}</div>
-    </div>
-    <div class="progress" style="width: {{progress}}%"></div>
     <div class="volume">
       <button data-ng-click="changeVolume(-1)">-</button>
       <span>{{volume}}</span>
       <button data-ng-click="changeVolume(+1)">+</button>
+    </div>
+    <div class="current-song">
+      <div data-col="name">{{song.get("name")}}</div>
+      <div data-col="artist">{{song.get("artist")}}</div>
     </div>
   </div>
   

@@ -242,7 +242,7 @@ app.service("playlist", function($rootScope) {
 
   return {
     add: function(songs, index) {
-      console.log("Adding", songs.length, "songs!");
+      console.log("Adding", songs.length, "songs to the playlist!");
       _songs = _songs.concat(songs);
       if(index > -1) this.play(index);
     },
@@ -288,9 +288,17 @@ app.controller("MainCtrl", function($scope, $location, $route, dropbox) {
     $location.path("/login");
   }
 
+  $scope.query = "";
   $scope.search = function() {
     $location.path("/search/"+$scope.query);
   };
+  $scope.$on('$routeChangeSuccess', function(e, current, previous) {
+    if(current.loadedTemplateUrl === "SearchView") {
+      $scope.query = current.params.query;
+    } else {
+      $scope.query = "";
+    }
+  });
 });
 app.controller("LoginCtrl", function($scope, $location, dropbox) {
   $scope.login = function() {
