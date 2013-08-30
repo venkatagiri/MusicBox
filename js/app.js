@@ -264,11 +264,11 @@ app.service("playlist", function($rootScope) {
 });
 
 // Controllers
-app.controller("MainCtrl", function($scope, $location, dropbox) {
+app.controller("MainCtrl", function($scope, $location, $route, dropbox) {
   if(dropbox.isLoggedIn()) {
     $scope.$on("datastore.loaded",  function() {
       document.body.classList.remove("loading");
-      $location.path("/login");
+      $route.reload();
     });
   } else {
     document.body.classList.remove("loading");
