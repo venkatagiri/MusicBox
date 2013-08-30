@@ -12,6 +12,7 @@ app.config(function($routeProvider) {
   .when("/artists", { templateUrl: "ArtistsView", controller: "ArtistsCtrl" })
   .when("/genres", { templateUrl: "GenresView", controller: "GenresCtrl" })
   .when("/queue", { templateUrl: "QueueView", controller: "QueueCtrl" })
+  .when("/search/:query", { templateUrl: "SearchView", controller: "SearchCtrl" })
   .otherwise({redirectTo: "/login"});
 });
 
@@ -30,6 +31,18 @@ app.directive("activeLink", function($location) {
         }
       });
     }
+  };
+});
+
+// Filter for searching
+app.filter("name", function() {
+  return function(input, key) {
+    var output = [];
+    for (var i = 0, len=input.length; i < len; i++) {
+      if(input[i].get("name").toLowerCase().indexOf(key.toLowerCase()) > -1)
+          output.push(input[i]);
+    }
+    return output;
   };
 });
 
@@ -274,6 +287,10 @@ app.controller("MainCtrl", function($scope, $location, $route, dropbox) {
     document.body.classList.remove("loading");
     $location.path("/login");
   }
+
+  $scope.search = function() {
+    $location.path("/search/"+$scope.query);
+  };
 });
 app.controller("LoginCtrl", function($scope, $location, dropbox) {
   $scope.login = function() {
@@ -388,6 +405,14 @@ app.controller("PlayerCtrl", function($scope, $timeout, playlist, dropbox) {
       playlist.nextSong();
     }
   }, false);
+});
+app.controller("SearchCtrl", function($scope, $routeParams, $filter, library, playlist) {
+  $scope.songs = $filter("name")(library.songs(), $routeParams.query);
+  
+  $scope.playSong = function() {
+    playlist.clear();
+    playlist.add($scope.songs, this.$index);
+  };
 });
 app.controller("SongsCtrl", function($scope, playlist, library) {
   $scope.songs = library.songs();

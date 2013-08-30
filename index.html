@@ -22,6 +22,11 @@
         <li><a href="#/songs">Songs</a></li>
         <li><a href="#/genres">Genres</a></li>
         <li><a href="#/queue">Queue</a></li>
+        <li>
+          <form class="pure-form" data-ng-submit="search()">
+            <input type="text" placeholder="Search.." data-ng-model="query" data-ng-trim="false" />
+          </form>
+        </li>
         <li><span class="pure-menu-heading">Account</span></li>
         <li><a href="#/build">Build Library</a></li>
         <li><a href="#/logout">Logout</a></li>
@@ -125,6 +130,13 @@
         <tr data-ng-hide="songs.length"><td>The queue is currently empty</td></tr>
       </tbody>
     </table>
+  </script>
+
+  <script type="text/ng-template" id="SearchView">
+    <p data-ng-show="!songs.length">No Results</p>
+    <div class="results">
+      <div data-ng-include="'SongsView'" data-ng-show="songs.length"></div>
+    </div>
   </script>
 
   <script type="text/ng-template" id="LoginView">
