@@ -231,7 +231,7 @@ app.service("playlist", function($rootScope) {
     add: function(songs, index) {
       console.log("Adding", songs.length, "songs!");
       _songs = _songs.concat(songs);
-      if(index) this.play(index);
+      if(index > -1) this.play(index);
     },
     songs: function() {
       return _songs;
