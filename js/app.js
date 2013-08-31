@@ -131,8 +131,7 @@ app.service("library", function($rootScope) {
 app.service("dropbox", function($rootScope, library) {
   var client = new Dropbox.Client({ key: "rkii6jl2u8un1xc" });
   client.authDriver(new Dropbox.AuthDriver.Popup({
-    // receiverUrl: "https://c9.io/venkatagiri/tlf/workspace/Dropbox/Projects/db-player/oauth_receiver.html"
-    receiverUrl: "https://tlfx.tk/db-player/oauth_receiver.html"
+    receiverUrl: location.origin + location.pathname + "oauth_receiver.html"
   }));
   client.authenticate({interactive: false}, function() {
     if(!client.isAuthenticated()) return;
