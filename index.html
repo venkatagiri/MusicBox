@@ -10,7 +10,7 @@
 </head>
 <body class="loading" data-ng-controller="MainCtrl">
   <header>
-    <h1 class="brand-title">DB Music</h1>
+    <h1>DB Music</h1>
     <form class="pure-form search-form" data-ng-submit="search()">
       <input class="pure-input-2-3" type="text" placeholder="Search music.." data-ng-model="query" data-ng-trim="false" />
     </form>
@@ -66,7 +66,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="song in songs" data-ng-dblclick="playSong()">
+        <tr data-ng-repeat="song in songs | orderBy:orderByName" data-ng-dblclick="playSong()">
           <td data-col="name">{{song.get("name")}}</td>
           <td data-col="artist">{{song.get("artist")}}</td>
           <td data-col="album">{{song.get("album")}}</td>

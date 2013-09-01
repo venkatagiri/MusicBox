@@ -34,13 +34,13 @@ app.directive("activeLink", function($location) {
   };
 });
 
-// Filter for searching
+// Filters
 app.filter("name", function() {
   return function(input, key) {
     var output = [];
     for (var i = 0, len=input.length; i < len; i++) {
       if(input[i].get("name").toLowerCase().indexOf(key.toLowerCase()) > -1)
-          output.push(input[i]);
+        output.push(input[i]);
     }
     return output;
   };
@@ -60,7 +60,7 @@ app.run(function($rootScope, $location, dropbox) {
 });
 
 // Library Service
-app.service("library", function($rootScope) {
+app.service("library", function($rootScope, lastfm) {
   var datastore = false,
     songs, albums, artists, genres;
   
@@ -97,6 +97,10 @@ app.service("library", function($rootScope) {
         });
       }
       artist.get('albums').push(tags.album);
+      lastfm.getArtistImage(tags.artist, function(error, image) {
+        if(error) artist.set("image", "");
+        else artist.set("image", image);
+      });
       
       // Genres
       var genre = genres.query({name: tags.genre})[0];
@@ -230,6 +234,27 @@ app.service("dropbox", function($rootScope, library) {
     },
     reset: function(callback) {
       client.getDatastoreManager().deleteDatastore("default", callback);
+    }
+  };
+});
+
+// LastFM Service
+app.service("lastfm", function($rootScope) {
+  var lastfm = new LastFM({
+    apiKey    : 'd8f190ffa963f1611d8b09478b6fd99a',
+    apiSecret : 'af524e1751eeabc345b5b47b0a8203fa'
+  });
+
+  return {
+    getArtistImage: function(name, callback) {
+      lastfm.artist.getInfo({artist: name}, {
+        success: function(data) {
+          callback(null, data.artist.image[2]["#text"]);
+        },
+        error: function(code, message) {
+          callback(message);
+        }
+      });
     }
   };
 });
@@ -425,6 +450,10 @@ app.controller("SearchCtrl", function($scope, $routeParams, $filter, library, pl
 app.controller("SongsCtrl", function($scope, playlist, library) {
   $scope.songs = library.songs();
   
+  $scope.orderByName = function(song) {
+    return song.get("name");
+  };
+
   $scope.playSong = function() {
     playlist.clear();
     playlist.add($scope.songs, this.$index);
