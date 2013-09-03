@@ -16,7 +16,10 @@ body.loading::after {
 }
 a {
   text-decoration: none;
-  color: #1b98f8;
+  color: #333;
+}
+a:hover {
+  text-decoration: underline;
 }
 
 /* Header */
@@ -67,6 +70,7 @@ h3 {
 }
 #nav a:hover, #nav a.active {
   background: #eee;
+  text-decoration: none;
 }
 #nav .pure-menu-heading {
   margin: 0;
@@ -134,9 +138,15 @@ h3 {
 }
 .current-song div[data-col=name] {
   font-weight: bold;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .current-song div[data-col=artist] {
   font-size: .9em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .progress {
@@ -176,6 +186,9 @@ h3 {
 .pure-table td {
   border: 0;
 }
+.pure-table [data-col=index] {
+  width: 10px;
+}
 .pure-table [data-col=artist], .pure-table [data-col=album] {
   max-width: 250px;
   white-space: nowrap;
@@ -183,5 +196,33 @@ h3 {
   text-overflow: ellipsis;
 }
 .pure-table .selected {
-  background: #f7f7f7;
+  background: #fff;
+}
+
+/* Artists List */
+.cards {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.card {
+  display: inline-block;
+  width: 126px;
+  margin: 5px;
+  background: white;
+  vertical-align: top;
+  cursor: pointer;
+  text-align: center;
+}
+.card:hover img {
+  opacity: 0.8;
+}
+.card .title {
+  margin: 0 0 5px;
+}
+.card-album {
+  width: 174px;
+}
+.card-artist {
+  width: 126px;
 }

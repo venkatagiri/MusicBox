@@ -22,7 +22,7 @@
       <li><a href="#/artists">Artists</a></li>
       <li><a href="#/albums">Albums</a></li>
       <li><a href="#/songs">Songs</a></li>
-      <li><a href="#/genres">Genres</a></li>
+      <!-- <li><a href="#/genres">Genres</a></li> -->
       <li><a href="#/queue">Queue</a></li>
       <li><span class="pure-menu-heading">Account</span></li>
       <li><a href="#/build">Build Library</a></li>
@@ -54,49 +54,69 @@
     </div>
   </div>
   
-  <script type="text/ng-template" id="SongsView">
+  <script type="text/ng-template" id="songs/list">
     <h2>Songs</h2>
     <p data-ng-show="!songs.length">No Songs</p>
     <table class="pure-table pure-table-horizontal" data-ng-show="songs.length">
       <thead>
         <tr>
+          <td data-col="index">#</td>
           <td data-col="name">Name</td>
           <td data-col="artist">Artist</td>
           <td data-col="album">Album</td>
         </tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="song in songs | orderBy:orderByName" data-ng-dblclick="playSong()">
+        <tr data-ng-repeat="song in songs" data-ng-dblclick="play()">
+          <td data-col="index">{{$index+1}}</td>
           <td data-col="name">{{song.get("name")}}</td>
-          <td data-col="artist">{{song.get("artist")}}</td>
-          <td data-col="album">{{song.get("album")}}</td>
+          <td data-col="artist"><a href="#/artists/{{song.get('artist')}}">{{song.get("artist")}}</a></td>
+          <td data-col="album"><a href="#/artists/{{song.get('artist')}}/albums/{{song.get('album')}}">{{song.get("album")}}</a></td>
         </tr>
       </tbody>
     </table>
   </script>
 
-  <script type="text/ng-template" id="AlbumsView">
-    <table class="pure-table pure-table-horizontal">
-      <thead>
-        <tr><td>Album Name</td></tr>
-      </thead>
-      <tbody>
-        <tr data-ng-repeat="album in albums" data-ng-dblclick="play(album)"><td>{{album.get("name")}}</td></tr>
-        <tr data-ng-hide="albums.length"><td>No Albums</td></tr>
-      </tbody>
-    </table>
+  <script type="text/ng-template" id="albums/list">
+    <h2>Albums</h2>
+    <ul class="cards">
+      <li data-ng-repeat="album in albums | orderBy:orderByName" class="card card-album">
+        <a href="#/artists/{{album.get('artist')}}/albums/{{album.get('name')}}" title="{{album.get('name')}}">
+          <img src="{{album.get('image') || 'img/default_art.png'}}" />
+          <p class="title">{{album.get("name")}}</p>
+        </a>
+      </li>
+    </ul>
   </script>
 
-  <script type="text/ng-template" id="ArtistsView">
-    <table class="pure-table pure-table-horizontal">
-      <thead>
-        <tr><td>Artist Name</td></tr>
-      </thead>
-      <tbody>
-        <tr data-ng-repeat="artist in artists" data-ng-dblclick="play(artist)"><td>{{artist.get("name")}}</td></tr>
-        <tr data-ng-hide="artists.length"><td>No Artists</td></tr>
-      </tbody>
-    </table>
+  <script type="text/ng-template" id="albums/show">
+    <h2>{{album.get("name")}} - {{album.get("artist")}}</h2>
+    <img src="{{album.get('image') || 'img/default_art.png'}}" />
+    <div data-ng-include="'songs/list'"></div>
+  </script>
+
+  <script type="text/ng-template" id="artists/list">
+    <h2>Artists</h2>
+    <ul data-ng-show="artists.length" class="cards">
+      <li data-ng-repeat="artist in artists | orderBy:orderByName" class="card card-artist">
+        <a href="#/artists/{{artist.get('name')}}" title="{{artist.get('name')}}">
+          <img src="{{artist.get('image') || 'img/default_art.png'}}" />
+          <p class="title">{{artist.get("name")}}</p>
+        </a>
+      </li>
+    </ul>
+  </script>
+
+  <script type="text/ng-template" id="artists/show">
+    <h2>{{artist.get("name")}}</h2>
+    <ul class="cards">
+      <li data-ng-repeat="album in albums | orderBy:orderByName" class="card card-album">
+        <a href="#/artists/{{album.get('artist')}}/albums/{{album.get('name')}}" title="{{album.get('name')}}">
+          <img src="{{album.get('image') || 'img/default_art.png'}}" />
+          <p class="title">{{album.get("name")}}</p>
+        </a>
+      </li>
+    </ul>
   </script>
 
   <script type="text/ng-template" id="GenresView">
@@ -123,7 +143,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="song in songs" data-ng-dblclick="playSong()" data-ng-class="{selected: $index==nowPlaying}">
+        <tr data-ng-repeat="song in songs" data-ng-dblclick="play()" data-ng-class="{selected: $index==nowPlaying}">
           <td data-col="name">{{song.get("name")}}</td>
           <td data-col="artist">{{song.get("artist")}}</td>
           <td data-col="album">{{song.get("album")}}</td>
@@ -133,9 +153,11 @@
   </script>
 
   <script type="text/ng-template" id="SearchView">
-    <p data-ng-show="!songs.length">No results found</p>
+    <p data-ng-show="!songs.length && !albums.length && !artists.length">No results found</p>
     <div class="results">
-      <div data-ng-include="'SongsView'" data-ng-show="songs.length"></div>
+      <div data-ng-include="'artists/list'" data-ng-show="artists.length"></div>
+      <div data-ng-include="'albums/list'" data-ng-show="albums.length"></div>
+      <div data-ng-include="'songs/list'" data-ng-show="songs.length"></div>
     </div>
   </script>
 
@@ -151,6 +173,13 @@
 
     <button class="pure-button pure-button-primary" data-ng-click="reset()">Reset</button>
     <p data-ng-show="reset_msg">{{reset_msg}}</p>
+
+    <br />
+
+    <button class="pure-button pure-button-primary" data-ng-click="loadImages()">Load Albums Images</button>
+    <p data-ng-show="image_msg">{{image_msg}} {{image_done}}/{{image_total}}</p>
+    <br />
+
   </script>
 
   <script src="js/lib/dropbox-datastores-0.1.0-b3.js"></script>
