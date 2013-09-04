@@ -24,6 +24,7 @@
       <li><a href="#/songs">Songs</a></li>
       <!-- <li><a href="#/genres">Genres</a></li> -->
       <li><a href="#/queue">Queue</a></li>
+
       <li><span class="pure-menu-heading">Account</span></li>
       <li><a href="#/build">Build Library</a></li>
       <li><a href="#/logout">Logout</a></li>
@@ -49,15 +50,15 @@
       <button data-ng-click="changeVolume(+1)">+</button>
     </div>
     <div class="current-song">
-      <div data-col="name">{{song.get("name")}}</div>
-      <div data-col="artist">{{song.get("artist")}}</div>
+      <div data-col="name" title="{{song.get('name')}}">{{song.get("name")}}</div>
+      <div data-col="artist" title="{{song.get('artist')}}">{{song.get("artist")}}</div>
     </div>
   </div>
   
   <script type="text/ng-template" id="songs/list">
     <h2>Songs</h2>
     <p data-ng-show="!songs.length">No Songs</p>
-    <table class="pure-table pure-table-horizontal" data-ng-show="songs.length">
+    <table class="pure-table pure-table-horizontal songs-list" data-ng-show="songs.length">
       <thead>
         <tr>
           <td data-col="index">#</td>
@@ -67,11 +68,16 @@
         </tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="song in songs" data-ng-dblclick="play()">
-          <td data-col="index">{{$index+1}}</td>
-          <td data-col="name">{{song.get("name")}}</td>
-          <td data-col="artist"><a href="#/artists/{{song.get('artist')}}">{{song.get("artist")}}</a></td>
-          <td data-col="album"><a href="#/artists/{{song.get('artist')}}/albums/{{song.get('album')}}">{{song.get("album")}}</a></td>
+        <tr data-ng-repeat="song in (filteredSongs = (songs | orderBy:orderByName)) track by $index" data-ng-dblclick="play()">
+          <td data-col="index">
+            <span>{{$index+1}}</span>
+            <button data-ng-click="addToQueue(song)" title="Add to Queue" class="add-to-queue">+</button>
+          </td>
+          <td data-col="name">
+            {{song.get("name")}}
+          </td>
+          <td data-col="artist"><a href="#/artist/{{song.get('artist')}}">{{song.get("artist")}}</a></td>
+          <td data-col="album"><a href="#/artist/{{song.get('artist')}}/album/{{song.get('album')}}">{{song.get("album")}}</a></td>
         </tr>
       </tbody>
     </table>
@@ -80,8 +86,8 @@
   <script type="text/ng-template" id="albums/list">
     <h2>Albums</h2>
     <ul class="cards">
-      <li data-ng-repeat="album in albums | orderBy:orderByName" class="card card-album">
-        <a href="#/artists/{{album.get('artist')}}/albums/{{album.get('name')}}" title="{{album.get('name')}}">
+      <li data-ng-repeat="album in (albums | orderBy:orderByName) track by $index" class="card card-album">
+        <a href="#/artist/{{album.get('artist')}}/album/{{album.get('name')}}" title="{{album.get('name')}}">
           <img src="{{album.get('image') || 'img/default_art.png'}}" />
           <p class="title">{{album.get("name")}}</p>
         </a>
@@ -98,8 +104,8 @@
   <script type="text/ng-template" id="artists/list">
     <h2>Artists</h2>
     <ul data-ng-show="artists.length" class="cards">
-      <li data-ng-repeat="artist in artists | orderBy:orderByName" class="card card-artist">
-        <a href="#/artists/{{artist.get('name')}}" title="{{artist.get('name')}}">
+      <li data-ng-repeat="artist in (artists | orderBy:orderByName) track by $index" class="card card-artist">
+        <a href="#/artist/{{artist.get('name')}}" title="{{artist.get('name')}}">
           <img src="{{artist.get('image') || 'img/default_art.png'}}" />
           <p class="title">{{artist.get("name")}}</p>
         </a>
@@ -109,17 +115,10 @@
 
   <script type="text/ng-template" id="artists/show">
     <h2>{{artist.get("name")}}</h2>
-    <ul class="cards">
-      <li data-ng-repeat="album in albums | orderBy:orderByName" class="card card-album">
-        <a href="#/artists/{{album.get('artist')}}/albums/{{album.get('name')}}" title="{{album.get('name')}}">
-          <img src="{{album.get('image') || 'img/default_art.png'}}" />
-          <p class="title">{{album.get("name")}}</p>
-        </a>
-      </li>
-    </ul>
+    <div data-ng-include="'albums/list'"></div>
   </script>
 
-  <script type="text/ng-template" id="GenresView">
+  <script type="text/ng-template" id="genres/list">
     <table class="pure-table pure-table-horizontal">
       <thead>
         <tr><td>Genre</td></tr>
@@ -131,28 +130,30 @@
     </table>
   </script>
 
-  <script type="text/ng-template" id="QueueView">
+  <script type="text/ng-template" id="queue">
     <h2>Queue</h2>
     <p data-ng-show="!songs.length">The queue is currently empty</p>
-    <table class="pure-table pure-table-horizontal" data-ng-show="songs.length">
+    <table class="pure-table pure-table-horizontal songs-list" data-ng-show="songs.length">
       <thead>
         <tr>
+          <td data-col="index">#</td>
           <td data-col="name">Name</td>
           <td data-col="artist">Artist</td>
           <td data-col="album">Album</td>
         </tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="song in songs" data-ng-dblclick="play()" data-ng-class="{selected: $index==nowPlaying}">
+        <tr data-ng-repeat="song in songs track by $index" data-ng-dblclick="play()" data-ng-class="{selected: $index==nowPlaying}">
+          <td data-col="index">{{$index+1}}</td>
           <td data-col="name">{{song.get("name")}}</td>
-          <td data-col="artist">{{song.get("artist")}}</td>
-          <td data-col="album">{{song.get("album")}}</td>
+          <td data-col="artist"><a href="#/artist/{{song.get('artist')}}">{{song.get("artist")}}</a></td>
+          <td data-col="album"><a href="#/artist/{{song.get('artist')}}/album/{{song.get('album')}}">{{song.get("album")}}</a></td>
         </tr>
       </tbody>
     </table>
   </script>
 
-  <script type="text/ng-template" id="SearchView">
+  <script type="text/ng-template" id="search">
     <p data-ng-show="!songs.length && !albums.length && !artists.length">No results found</p>
     <div class="results">
       <div data-ng-include="'artists/list'" data-ng-show="artists.length"></div>
@@ -161,13 +162,13 @@
     </div>
   </script>
 
-  <script type="text/ng-template" id="LoginView">
+  <script type="text/ng-template" id="login">
     <button class="pure-button pure-button-primary" data-ng-click="login()">Login to Dropbox</button>
     <p data-ng-show="loggingIn">Logging In...</p>
     <p data-ng-show="error">Login Failed. Reason: {{error}}</p>
   </script>
   
-  <script type="text/ng-template" id="BuildLibraryView">
+  <script type="text/ng-template" id="build">
     <button class="pure-button pure-button-primary" data-ng-click="build()">Build the Library</button>
     <p data-ng-show="msg">{{msg}} {{done}}/{{total}}</p>
 

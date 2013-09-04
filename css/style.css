@@ -101,6 +101,7 @@ h3 {
   background: white;
   padding: 0;
   border-top: 1px solid #ccc;
+  z-index: 99;
 }
 .controls {
   float: left;
@@ -162,44 +163,59 @@ h3 {
 }
 
 /* Songs List */
-.pure-table {
+.songs-list {
   width: 100%;
   border: 0;
 }
-.pure-table thead {
+.songs-list thead {
   text-transform: uppercase;
   font-size: .9em;
   color: #e62020;
   background: none;
 }
-.pure-table thead tr {
+.songs-list thead tr {
   border: 0;
 }
-.pure-table tbody tr {
+.songs-list tbody tr {
   border: 0;
   border-bottom: 1px solid #ddd;
   cursor: pointer;
 }
-.pure-table tbody tr:hover {
+.songs-list tbody tr:hover {
   background: #fff;
 }
-.pure-table td {
+.songs-list td {
   border: 0;
+  position: relative;
 }
-.pure-table [data-col=index] {
-  width: 10px;
+.songs-list [data-col=index] {
+  width: 25px;
+  text-align: center;
 }
-.pure-table [data-col=artist], .pure-table [data-col=album] {
+.songs-list [data-col=artist], .songs-list [data-col=album] {
+  width: 250px;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.pure-table .selected {
+.songs-list .selected {
   background: #fff;
 }
+.songs-list .add-to-queue {
+  position: absolute;
+  top: 4px;
+  left: 12px;
+  display: none;
+}
+.songs-list tr:hover .add-to-queue {
+  display: block;
+}
+.songs-list tr:hover [data-col=index] span {
+  display: none;
+}
 
-/* Artists List */
+/* Cards List */
 .cards {
   list-style-type: none;
   margin: 0;
@@ -219,6 +235,9 @@ h3 {
 }
 .card .title {
   margin: 0 0 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .card-album {
   width: 174px;

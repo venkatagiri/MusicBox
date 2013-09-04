@@ -11,17 +11,17 @@ app.config(function($routeProvider) {
   };
 
   $routeProvider
-  .when("/login", { templateUrl: "LoginView", controller: "LoginCtrl" })
+  .when("/login", { templateUrl: "login", controller: "LoginCtrl" })
   .when("/logout", { controller: "LogoutCtrl" })
-  .when("/build", { templateUrl: "BuildLibraryView", controller: "BuildLibraryCtrl" })
+  .when("/build", { templateUrl: "build", controller: "BuildLibraryCtrl" })
   .when("/songs", { templateUrl: "songs/list", controller: "SongsListCtrl", resolve: resolveLibrary })
   .when("/albums", { templateUrl: "albums/list", controller: "AlbumsListCtrl", resolve: resolveLibrary })
-  .when("/artists/:artist/albums/:album", { templateUrl: "albums/show", controller: "AlbumsShowCtrl", resolve: resolveLibrary })
+  .when("/artist/:artist/album/:album", { templateUrl: "albums/show", controller: "AlbumsShowCtrl", resolve: resolveLibrary })
   .when("/artists", { templateUrl: "artists/list", controller: "ArtistsListCtrl", resolve: resolveLibrary })
-  .when("/artists/:artist", { templateUrl: "artists/show", controller: "ArtistsShowCtrl", resolve: resolveLibrary })
-  .when("/genres", { templateUrl: "GenresView", controller: "GenresCtrl", resolve: resolveLibrary })
-  .when("/queue", { templateUrl: "QueueView", controller: "QueueCtrl", resolve: resolveLibrary })
-  .when("/search/:query", { templateUrl: "SearchView", controller: "SearchCtrl", resolve: resolveLibrary })
+  .when("/artist/:artist", { templateUrl: "artists/show", controller: "ArtistsShowCtrl", resolve: resolveLibrary })
+  .when("/genres", { templateUrl: "genres/list", controller: "GenresCtrl", resolve: resolveLibrary })
+  .when("/queue", { templateUrl: "queue", controller: "QueueCtrl", resolve: resolveLibrary })
+  .when("/search/:query", { templateUrl: "search", controller: "SearchCtrl", resolve: resolveLibrary })
   .otherwise({redirectTo: "/login"});
 });
 
@@ -113,12 +113,12 @@ app.service("library", function($rootScope, $q, lastfm) {
           artist: tags.artist,
           songs: []
         });
+        lastfm.getAlbumImage(tags.artist, tags.album, function(error, image) {
+          if(error) album.set("image", "");
+          else album.set("image", image);
+        });
       }
       album.get('songs').push(song.getId());
-      lastfm.getAlbumImage(tags.artist, tags.album, function(error, image) {
-        if(error) album.set("image", "");
-        else album.set("image", image);
-      });
       
       // Artists
       var artist = artists.query({name: tags.artist})[0];
@@ -127,12 +127,12 @@ app.service("library", function($rootScope, $q, lastfm) {
           name: tags.artist,
           albums: []
         });
+        lastfm.getArtistImage(tags.artist, function(error, image) {
+          if(error) artist.set("image", "");
+          else artist.set("image", image);
+        });
       }
-      artist.get('albums').push(tags.album);
-      lastfm.getArtistImage(tags.artist, function(error, image) {
-        if(error) artist.set("image", "");
-        else artist.set("image", image);
-      });
+      if(artist.get('albums').toArray().indexOf(tags.album) == -1) artist.get('albums').push(tags.album);
       
       // Genres
       var genre = genres.query({name: tags.genre})[0];
@@ -142,7 +142,7 @@ app.service("library", function($rootScope, $q, lastfm) {
           albums: []
         });
       }
-      genre.get('albums').push(tags.album);
+      if(genre.get('albums').toArray().indexOf(tags.album) == -1) genre.get('albums').push(tags.album);
     }, { tags: ["artist", "title", "album", "genre"] });
   };
 
@@ -334,9 +334,10 @@ app.service("playlist", function($rootScope) {
 
   return {
     add: function(songs, index) {
-      console.log("Adding", songs.length, "songs to the playlist!");
+      console.log("Adding", songs.length, "song(s) to the playlist!");
       _songs = _songs.concat(songs);
       if(index > -1) this.play(index);
+      else if(_songs.length == songs.length) this.play(0);
     },
     songs: function() {
       return _songs;
@@ -384,7 +385,7 @@ app.controller("MainCtrl", function($scope, $location, $route, dropbox) {
     $location.path("/search/"+$scope.query);
   };
   $scope.$on('$routeChangeSuccess', function(e, current, previous) {
-    if(current.loadedTemplateUrl === "SearchView") {
+    if(current.loadedTemplateUrl === "search") {
       $scope.query = current.params.query;
     } else {
       $scope.query = "";
@@ -528,22 +529,29 @@ app.controller("PlayerCtrl", function($scope, $timeout, playlist, dropbox) {
   }, false);
 });
 app.controller("SearchCtrl", function($scope, $routeParams, $filter, orderByFilter, library, playlist) {
-  $scope.songs = orderByFilter($filter("song")(library.getAllSongs(), $routeParams.query), "orderByName");
-
+  $scope.songs = $filter("song")(library.getAllSongs(), $routeParams.query);
   $scope.albums = $filter("name")(library.getAllAlbums(), $routeParams.query);
   $scope.artists = $filter("name")(library.getAllArtists(), $routeParams.query);
   
   $scope.play = function() {
     playlist.clear();
-    playlist.add($scope.songs, this.$index);
+    playlist.add($scope.filteredSongs, this.$index);
+  };
+
+  $scope.addToQueue = function(song) {
+    playlist.add([song]);
   };
 });
 app.controller("SongsListCtrl", function($scope, playlist, library) {
-  $scope.songs = orderByFilter(library.getAllSongs(), "orderByName");
+  $scope.songs = library.getAllSongs();
  
   $scope.play = function() {
     playlist.clear();
-    playlist.add($scope.songs, this.$index);
+    playlist.add($scope.filteredSongs, this.$index);
+  };
+
+  $scope.addToQueue = function(song) {
+    playlist.add([song]);
   };
 });
 app.controller("AlbumsListCtrl", function($scope, library) {
@@ -557,11 +565,18 @@ app.controller("AlbumsShowCtrl", function($scope, $routeParams, library, playlis
     playlist.clear();
     playlist.add($scope.songs, this.$index);
   };
+  
+  $scope.addToQueue = function(song) {
+    playlist.add([song]);
+  };
 });
-app.controller("ArtistsListCtrl", function($scope, library, lastfm) {
+app.controller("ArtistsListCtrl", function($scope, library) {
   $scope.artists = library.getAllArtists();
+  $scope.orderByName = function(record) {
+    return record.get("name");
+  };
 });
-app.controller("ArtistsShowCtrl", function($scope, $routeParams, library, lastfm) {
+app.controller("ArtistsShowCtrl", function($scope, $routeParams, library) {
   $scope.artist = library.getArtist($routeParams.artist);
   $scope.albums = library.getAlbums($routeParams.artist);
 });
