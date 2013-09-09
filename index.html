@@ -22,7 +22,7 @@
       <li><a href="#/artists">Artists</a></li>
       <li><a href="#/albums">Albums</a></li>
       <li><a href="#/songs">Songs</a></li>
-      <!-- <li><a href="#/genres">Genres</a></li> -->
+      <li><a href="#/genres">Genres</a></li>
       <li><a href="#/queue">Queue</a></li>
 
       <li><span class="pure-menu-heading">Account</span></li>
@@ -85,7 +85,8 @@
 
   <script type="text/ng-template" id="albums/list">
     <h2>Albums</h2>
-    <ul class="cards">
+    <p data-ng-show="!albums.length">No Albums</p>
+    <ul class="cards" data-ng-show="albums.length">
       <li data-ng-repeat="album in (albums | orderBy:orderByName) track by $index" class="card card-album">
         <a href="#/artist/{{album.get('artist')}}/album/{{album.get('name')}}" title="{{album.get('name')}}">
           <img src="{{album.get('image') || 'img/default_art.png'}}" />
@@ -103,7 +104,8 @@
 
   <script type="text/ng-template" id="artists/list">
     <h2>Artists</h2>
-    <ul data-ng-show="artists.length" class="cards">
+    <p data-ng-show="!artists.length">No Artists</p>
+    <ul class="cards" data-ng-show="artists.length">
       <li data-ng-repeat="artist in (artists | orderBy:orderByName) track by $index" class="card card-artist">
         <a href="#/artist/{{artist.get('name')}}" title="{{artist.get('name')}}">
           <img src="{{artist.get('image') || 'img/default_art.png'}}" />
@@ -119,15 +121,21 @@
   </script>
 
   <script type="text/ng-template" id="genres/list">
-    <table class="pure-table pure-table-horizontal">
+    <h2>Genres</h2>
+    <p data-ng-show="!genres.length">No Genres</p>
+    <table class="pure-table pure-table-horizontal" data-ng-show="genres.length" >
       <thead>
         <tr><td>Genre</td></tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="genre in genres" data-ng-dblclick=""><td>{{genre.get("name")}}</td></tr>
-        <tr data-ng-hide="genres.length"><td>No Genres</td></tr>
+        <tr data-ng-repeat="genre in genres"><td><a href="#/genre/{{genre.get('name')}}">{{genre.get("name")}}</a></td></tr>
       </tbody>
     </table>
+  </script>
+
+  <script type="text/ng-template" id="genres/show">
+    <h2>{{genre.get("name")}}</h2>
+    <div data-ng-include="'albums/list'"></div>
   </script>
 
   <script type="text/ng-template" id="queue">

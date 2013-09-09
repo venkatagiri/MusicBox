@@ -19,7 +19,8 @@ app.config(function($routeProvider) {
   .when("/artist/:artist/album/:album", { templateUrl: "albums/show", controller: "AlbumsShowCtrl", resolve: resolveLibrary })
   .when("/artists", { templateUrl: "artists/list", controller: "ArtistsListCtrl", resolve: resolveLibrary })
   .when("/artist/:artist", { templateUrl: "artists/show", controller: "ArtistsShowCtrl", resolve: resolveLibrary })
-  .when("/genres", { templateUrl: "genres/list", controller: "GenresCtrl", resolve: resolveLibrary })
+  .when("/genres", { templateUrl: "genres/list", controller: "GenresListCtrl", resolve: resolveLibrary })
+  .when("/genre/:genre", { templateUrl: "genres/show", controller: "GenresShowCtrl", resolve: resolveLibrary })
   .when("/queue", { templateUrl: "queue", controller: "QueueCtrl", resolve: resolveLibrary })
   .when("/search/:query", { templateUrl: "search", controller: "SearchCtrl", resolve: resolveLibrary })
   .otherwise({redirectTo: "/login"});
@@ -106,43 +107,35 @@ app.service("library", function($rootScope, $q, lastfm) {
       });
 
       // Albums
-      var album = albums.query({name: tags.album})[0];
-      if(!album) {
-        album = albums.insert({
+      if(albums.query({name: tags.album, artist: tags.artist}).length === 0) {
+        var album = albums.insert({
           name: tags.album,
           artist: tags.artist,
-          songs: []
+          genre: tags.genre
         });
         lastfm.getAlbumImage(tags.artist, tags.album, function(error, image) {
           if(error) album.set("image", "");
           else album.set("image", image);
         });
       }
-      album.get('songs').push(song.getId());
       
       // Artists
-      var artist = artists.query({name: tags.artist})[0];
-      if(!artist) {
-        artist = artists.insert({
-          name: tags.artist,
-          albums: []
+      if(artists.query({name: tags.artist}).length === 0) {
+        var artist = artists.insert({
+          name: tags.artist
         });
         lastfm.getArtistImage(tags.artist, function(error, image) {
           if(error) artist.set("image", "");
           else artist.set("image", image);
         });
       }
-      if(artist.get('albums').toArray().indexOf(tags.album) == -1) artist.get('albums').push(tags.album);
       
       // Genres
-      var genre = genres.query({name: tags.genre})[0];
-      if(!genre) {
-        genre = genres.insert({
-          name: tags.genre,
-          albums: []
+      if(genres.query({name: tags.genre}).length === 0) {
+        var genre = genres.insert({
+          name: tags.genre
         });
       }
-      if(genre.get('albums').toArray().indexOf(tags.album) == -1) genre.get('albums').push(tags.album);
     }, { tags: ["artist", "title", "album", "genre"] });
   };
 
@@ -159,33 +152,30 @@ app.service("library", function($rootScope, $q, lastfm) {
       $rootScope.$broadcast("datastore.loaded");
       deferred.resolve();
     },
-    getAllSongs: function() { return songs.query(); },
-    getSong: function(recordId) { return songs.get(recordId); },
-    getAllArtists: function() { return artists.query(); },
-    getArtist: function(artistName) {
-      return artists.query({name: artistName})[0];
+    getAllSongs: function() {
+      return songs.query();
     },
-    getAlbums: function(artistName) {
-      var albumNames = this.getArtist(artistName).get("albums").toArray(),
-        albums = [];
-      for(i=0, len=albumNames.length; i < len; i++)
-        albums.push(this.getAlbum(artistName, albumNames[i]));
-      return albums;
-    },
-    getAlbum: function(artistName, albumName) {
-      return albums.query({artist: artistName, name: albumName})[0];
+    getAllArtists: function() {
+      return artists.query();
     },
     getAllAlbums: function() {
       return albums.query();
     },
-    getSongs: function(artistName, albumName) {
-      var songIds = this.getAlbum(artistName, albumName).get("songs").toArray(),
-        songs = [];
-      for(i=0, len=songIds.length; i < len; i++)
-        songs.push(this.getSong(songIds[i]));
-      return songs;
+    getAllGenres: function() {
+      return genres.query();
     },
-    genres: function() { return datastore ? genres.query() : {}; }
+    getArtists: function(params) {
+      return artists.query(params);
+    },
+    getAlbums: function(params) {
+      return albums.query(params);
+    },
+    getSongs: function(params) {
+      return songs.query(params);
+    },
+    getGenres: function(params) {
+      return genres.query(params);
+    }
   };
 });
 
@@ -528,7 +518,7 @@ app.controller("PlayerCtrl", function($scope, $timeout, playlist, dropbox) {
     }
   }, false);
 });
-app.controller("SearchCtrl", function($scope, $routeParams, $filter, orderByFilter, library, playlist) {
+app.controller("SearchCtrl", function($scope, $routeParams, $filter, library, playlist) {
   $scope.songs = $filter("song")(library.getAllSongs(), $routeParams.query);
   $scope.albums = $filter("name")(library.getAllAlbums(), $routeParams.query);
   $scope.artists = $filter("name")(library.getAllArtists(), $routeParams.query);
@@ -558,8 +548,8 @@ app.controller("AlbumsListCtrl", function($scope, library) {
   $scope.albums = library.getAllAlbums();
 });
 app.controller("AlbumsShowCtrl", function($scope, $routeParams, library, playlist) {
-  $scope.album = library.getAlbum($routeParams.artist, $routeParams.album);
-  $scope.songs = library.getSongs($routeParams.artist, $routeParams.album);
+  $scope.album = library.getAlbums({name: $routeParams.album, artist: $routeParams.artist})[0];
+  $scope.songs = library.getSongs({album: $routeParams.album, artist: $routeParams.artist});
 
   $scope.play = function() {
     playlist.clear();
@@ -572,16 +562,17 @@ app.controller("AlbumsShowCtrl", function($scope, $routeParams, library, playlis
 });
 app.controller("ArtistsListCtrl", function($scope, library) {
   $scope.artists = library.getAllArtists();
-  $scope.orderByName = function(record) {
-    return record.get("name");
-  };
 });
 app.controller("ArtistsShowCtrl", function($scope, $routeParams, library) {
-  $scope.artist = library.getArtist($routeParams.artist);
-  $scope.albums = library.getAlbums($routeParams.artist);
+  $scope.artist = library.getArtists({name: $routeParams.artist})[0];
+  $scope.albums = library.getAlbums({artist: $routeParams.artist});
 });
-app.controller("GenresCtrl", function($scope, library) {
-  $scope.genres = library.genres();
+app.controller("GenresListCtrl", function($scope, library) {
+  $scope.genres = library.getAllGenres();
+});
+app.controller("GenresShowCtrl", function($scope, $routeParams, library) {
+  $scope.genre = library.getGenres({name: $routeParams.genre})[0];
+  $scope.albums = library.getAlbums({genre: $routeParams.genre});
 });
 app.controller("QueueCtrl", function($scope, playlist) {
   $scope.songs = playlist.songs();
