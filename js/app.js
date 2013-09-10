@@ -525,7 +525,7 @@ app.controller("SearchCtrl", function($scope, $routeParams, $filter, library, pl
   
   $scope.play = function() {
     playlist.clear();
-    playlist.add($scope.filteredSongs, this.$index);
+    playlist.add(this.filteredSongs, this.$index);
   };
 
   $scope.addToQueue = function(song) {
@@ -537,7 +537,7 @@ app.controller("SongsListCtrl", function($scope, playlist, library) {
  
   $scope.play = function() {
     playlist.clear();
-    playlist.add($scope.filteredSongs, this.$index);
+    playlist.add(this.filteredSongs, this.$index);
   };
 
   $scope.addToQueue = function(song) {
@@ -553,7 +553,7 @@ app.controller("AlbumsShowCtrl", function($scope, $routeParams, library, playlis
 
   $scope.play = function() {
     playlist.clear();
-    playlist.add($scope.songs, this.$index);
+    playlist.add(this.songs, this.$index);
   };
   
   $scope.addToQueue = function(song) {
