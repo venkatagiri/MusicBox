@@ -508,7 +508,6 @@ app.controller("PlayerCtrl", function($scope, $timeout, playlist, dropbox) {
   
   $scope.audio.addEventListener("ended", function() { $scope.next(); }, false);
   document.addEventListener("keypress", function(e) {
-    if([32, 37, 39].indexOf(e.keyCode) > -1) e.preventDefault();
     if(e.keyCode == 32) {
       if($scope.audio.paused) $scope.play();
       else $scope.pause();
