@@ -318,14 +318,14 @@ app.service("lastfm", function($rootScope) {
   };
 });
 
-// Playlist Service
-app.service("playlist", function($rootScope) {
+// Queue Service
+app.service("queue", function($rootScope) {
   var _songs = [],
     _index = -1;
 
   return {
     add: function(songs, index) {
-      console.log("Adding", songs.length, "song(s) to the playlist!");
+      console.log("Adding", songs.length, "song(s) to the queue!");
       _songs = _songs.concat(songs);
       if(index > -1) this.play(index);
       else if(_songs.length == songs.length) this.play(0);
@@ -446,7 +446,7 @@ app.controller("BuildLibraryCtrl", function($scope, library, dropbox, lastfm) {
   };
 
 });
-app.controller("PlayerCtrl", function($scope, $timeout, playlist, dropbox) {
+app.controller("PlayerCtrl", function($scope, $timeout, queue, dropbox) {
   $scope.audio = $("audio");
   $scope.volume = 4;
   $scope.audio.volume = $scope.volume * 0.1;
@@ -457,7 +457,7 @@ app.controller("PlayerCtrl", function($scope, $timeout, playlist, dropbox) {
   
   $scope.play = function() {
     if($scope.src === "") {
-      playlist.nextSong();
+      queue.nextSong();
     } else {
       $scope.audio.play();
       $scope.playing = true;
@@ -469,15 +469,15 @@ app.controller("PlayerCtrl", function($scope, $timeout, playlist, dropbox) {
   };
   $scope.next = function() {
     $scope.pause();
-    playlist.nextSong();
+    queue.nextSong();
   };
   $scope.prev = function() {
     $scope.pause();
-    playlist.previousSong();
+    queue.previousSong();
   };
   
   $scope.$on("song.change",  function() {
-    var song = playlist.currentSong();
+    var song = queue.currentSong();
     console.log("Current Song:", song.get("name"));
     
     $scope.pause();
@@ -512,52 +512,52 @@ app.controller("PlayerCtrl", function($scope, $timeout, playlist, dropbox) {
       if($scope.audio.paused) $scope.play();
       else $scope.pause();
     } else if(e.keyCode == 37) {
-      playlist.previousSong();
+      queue.previousSong();
     } else if(e.keyCode == 39) {
-      playlist.nextSong();
+      queue.nextSong();
     }
   }, false);
 });
-app.controller("SearchCtrl", function($scope, $routeParams, $filter, library, playlist) {
+app.controller("SearchCtrl", function($scope, $routeParams, $filter, library, queue) {
   $scope.songs = $filter("song")(library.getAllSongs(), $routeParams.query);
   $scope.albums = $filter("name")(library.getAllAlbums(), $routeParams.query);
   $scope.artists = $filter("name")(library.getAllArtists(), $routeParams.query);
   
   $scope.play = function() {
-    playlist.clear();
-    playlist.add(this.filteredSongs, this.$index);
+    queue.clear();
+    queue.add(this.filteredSongs, this.$index);
   };
 
   $scope.addToQueue = function(song) {
-    playlist.add([song]);
+    queue.add([song]);
   };
 });
-app.controller("SongsListCtrl", function($scope, playlist, library) {
+app.controller("SongsListCtrl", function($scope, queue, library) {
   $scope.songs = library.getAllSongs();
  
   $scope.play = function() {
-    playlist.clear();
-    playlist.add(this.filteredSongs, this.$index);
+    queue.clear();
+    queue.add(this.filteredSongs, this.$index);
   };
 
   $scope.addToQueue = function(song) {
-    playlist.add([song]);
+    queue.add([song]);
   };
 });
 app.controller("AlbumsListCtrl", function($scope, library) {
   $scope.albums = library.getAllAlbums();
 });
-app.controller("AlbumsShowCtrl", function($scope, $routeParams, library, playlist) {
+app.controller("AlbumsShowCtrl", function($scope, $routeParams, library, queue) {
   $scope.album = library.getAlbums({name: $routeParams.album, artist: $routeParams.artist})[0];
   $scope.songs = library.getSongs({album: $routeParams.album, artist: $routeParams.artist});
 
   $scope.play = function() {
-    playlist.clear();
-    playlist.add(this.songs, this.$index);
+    queue.clear();
+    queue.add(this.songs, this.$index);
   };
   
   $scope.addToQueue = function(song) {
-    playlist.add([song]);
+    queue.add([song]);
   };
 });
 app.controller("ArtistsListCtrl", function($scope, library) {
@@ -574,14 +574,14 @@ app.controller("GenresShowCtrl", function($scope, $routeParams, library) {
   $scope.genre = library.getGenres({name: $routeParams.genre})[0];
   $scope.albums = library.getAlbums({genre: $routeParams.genre});
 });
-app.controller("QueueCtrl", function($scope, playlist) {
-  $scope.songs = playlist.songs();
-  $scope.nowPlaying = playlist.index();
+app.controller("QueueCtrl", function($scope, queue) {
+  $scope.songs = queue.songs();
+  $scope.nowPlaying = queue.index();
 
   $scope.play = function() {
-    playlist.play(this.$index);
+    queue.play(this.$index);
   };
   $scope.$on("song.change", function() {
-    $scope.nowPlaying = playlist.index();
+    $scope.nowPlaying = queue.index();
   });
 });
