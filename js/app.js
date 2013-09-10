@@ -94,6 +94,7 @@ app.service("library", function($rootScope, $q, lastfm) {
     songs, albums, artists, genres;
   
   var _addSong = function(path, url) {
+    if(songs.query({path: path}).length > 0) return;
     ID3.loadTags(url, function() {
       var tags = ID3.getAllTags(url);
       
