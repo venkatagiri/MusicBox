@@ -12,8 +12,13 @@
 <body class="loading" data-ng-controller="MainCtrl">
   <header>
     <h1>DB Music</h1>
+    <div class="links" data-ng-show="dropbox.isLoggedIn()">
+      <span class="name">{{dropbox.getAccountName()}}</span>
+      <a href="#/settings">Settings</a>
+      <a href="#/logout">Logout</a>
+    </div>
     <form class="pure-form search-form" data-ng-submit="search()">
-      <input class="pure-input-2-3" type="text" placeholder="Search music.." data-ng-model="query" data-ng-trim="false" />
+      <input class="pure-input-2-3" type="text" placeholder="Search music..." data-ng-model="query" data-ng-trim="false" />
     </form>
   </header>
 
@@ -25,10 +30,6 @@
       <li><a href="#/songs">Songs</a></li>
       <li><a href="#/genres">Genres</a></li>
       <li><a href="#/queue">Queue</a></li>
-
-      <li><span class="pure-menu-heading">Account</span></li>
-      <li><a href="#/build">Build Library</a></li>
-      <li><a href="#/logout">Logout</a></li>
     </ul>
   </nav>
 
@@ -176,20 +177,23 @@
     <p data-ng-show="loggingIn">Logging In...</p>
     <p data-ng-show="error">Login Failed. Reason: {{error}}</p>
   </script>
+
+  <script type="text/ng-template" id="logout">
+    <p>Logging Out...</p>
+  </script>
   
-  <script type="text/ng-template" id="build">
-    <button class="pure-button pure-button-primary" data-ng-click="build()">Build the Library</button>
-    <p data-ng-show="msg">{{msg}} {{done}}/{{total}}</p>
+  <script type="text/ng-template" id="settings">
+    <h2>Settings</h2>
+    <p>Number of songs in your Dropbox: <strong>{{songsCount}}</strong></p>
+    <p>
+      <button class="pure-button pure-button-primary" data-ng-click="scanDropbox()">Scan Dropbox</button>
+      <span>{{msg || "Finds all audio files in your Dropbox and builds the Music Library."}}</span>
+    </p>
 
-    <button class="pure-button pure-button-primary" data-ng-click="reset()">Reset</button>
-    <p data-ng-show="reset_msg">{{reset_msg}}</p>
-
-    <br />
-
-    <button class="pure-button pure-button-primary" data-ng-click="loadImages()">Load Albums Images</button>
-    <p data-ng-show="image_msg">{{image_msg}} {{image_done}}/{{image_total}}</p>
-    <br />
-
+    <p>
+      <button class="pure-button pure-button-primary" data-ng-click="resetLibrary()">Reset Music Library</button>
+      <span>{{reset_msg || "Resets the Music Library(Your audio files will not be deleted)."}}</span>
+    </p>
   </script>
 
   <script src="js/lib/dropbox-datastores-0.1.0-b3.js"></script>

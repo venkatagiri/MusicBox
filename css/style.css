@@ -53,6 +53,17 @@ h3 {
   border-radius: 0 !important;
 }
 
+.links {
+  float: right;
+  padding: 15px 50px 0;
+}
+.links .name {
+  color: #e62020;
+}
+.links a {
+  margin-left: 10px;
+}
+
 /* Navigation */
 #nav {
   position: fixed;

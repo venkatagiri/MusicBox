@@ -6,14 +6,14 @@ app.config(function($routeProvider) {
   // A Promise to stop Controller execution till the dependency(Library) is loaded.
   var resolveLibrary = {
     'Library': function(library) {
-      return library.promise;
+      return library.loaded;
     }
   };
 
   $routeProvider
   .when("/login", { templateUrl: "login", controller: "LoginCtrl" })
-  .when("/logout", { controller: "LogoutCtrl" })
-  .when("/build", { templateUrl: "build", controller: "BuildLibraryCtrl" })
+  .when("/logout", { templateUrl: "logout", controller: "LogoutCtrl" })
+  .when("/settings", { templateUrl: "settings", controller: "SettingsCtrl", resolve: resolveLibrary })
   .when("/songs", { templateUrl: "songs/list", controller: "SongsListCtrl", resolve: resolveLibrary })
   .when("/albums", { templateUrl: "albums/list", controller: "AlbumsListCtrl", resolve: resolveLibrary })
   .when("/artist/:artist/album/:album", { templateUrl: "albums/show", controller: "AlbumsShowCtrl", resolve: resolveLibrary })
@@ -89,11 +89,11 @@ app.run(function($rootScope, $location, dropbox) {
 });
 
 // Library Service
-app.service("library", function($rootScope, $q, lastfm) {
+app.service("library", function($rootScope, $q, lastfm, dropbox) {
   var datastore = false,
     songs, albums, artists, genres;
   
-  var _addSong = function(path, url) {
+  function addSong(path, url) {
     if(songs.query({path: path}).length > 0) return;
     ID3.loadTags(url, function() {
       var tags = ID3.getAllTags(url);
@@ -137,22 +137,23 @@ app.service("library", function($rootScope, $q, lastfm) {
           name: tags.genre
         });
       }
+      $rootScope.$broadcast("library.song.added");
     }, { tags: ["artist", "title", "album", "genre"] });
-  };
+  }
+
+  dropbox.datastoreLoaded.then(function(ds) {
+    window.ds = datastore = ds;
+    songs = datastore.getTable("songs");
+    artists = datastore.getTable("artists");
+    albums = datastore.getTable("albums");
+    genres = datastore.getTable("genres");
+    $rootScope.$broadcast("datastore.loaded");
+    deferred.resolve();
+  });
 
   var deferred = $q.defer();
   return {
-    promise: deferred.promise,
-    add: _addSong,
-    setDatastore: function(ds) {
-      window.ds = datastore = ds;
-      songs = datastore.getTable("songs");
-      artists = datastore.getTable("artists");
-      albums = datastore.getTable("albums");
-      genres = datastore.getTable("genres");
-      $rootScope.$broadcast("datastore.loaded");
-      deferred.resolve();
-    },
+    loaded: deferred.promise,
     getAllSongs: function() {
       return songs.query();
     },
@@ -176,13 +177,40 @@ app.service("library", function($rootScope, $q, lastfm) {
     },
     getGenres: function(params) {
       return genres.query(params);
+    },
+    scanDropbox: function() {
+      dropbox.search("/", "mp3", {limit: 999}, function(error, files) {
+        if(error) {
+          console.log(error);
+          return callback(-1);
+        }
+        
+        console.log("Found", files.length, "songs");
+        for(var i=0, len=files.length; i < len; i++) {
+          (function(file) {
+            if(songs.query({path: file.path}).length > 0) return;
+            dropbox.getUrl(file.path, function(error, details) {
+              if(error) {
+                console.log(error);
+                return;
+              }
+              try {
+                addSong(file.path, details.url);
+              } catch(e) {
+                console.log("File:", file.path, "Error:", e);
+              }
+            });
+          })(files[i]);
+        }
+      });
     }
   };
 });
 
 // Dropbox Service
-app.service("dropbox", function($rootScope, library) {
-  var client = new Dropbox.Client({ key: "rkii6jl2u8un1xc" });
+app.service("dropbox", function($rootScope, $q) {
+  var client = new Dropbox.Client({ key: "rkii6jl2u8un1xc" }),
+    deferredDatastore = $q.defer();
   client.authDriver(new Dropbox.AuthDriver.Popup({
     receiverUrl: location.origin + location.pathname + "oauth_receiver.html"
   }));
@@ -195,11 +223,12 @@ app.service("dropbox", function($rootScope, library) {
           alert("Error opening default datastore: " + error);
           return;
         }
-        library.setDatastore(datastore);
+        deferredDatastore.resolve(datastore);
     });
   });
 
   return {
+    datastoreLoaded: deferredDatastore.promise,
     isLoggedIn: function() {
       return !!store.get("loggedin");
     },
@@ -212,17 +241,28 @@ app.service("dropbox", function($rootScope, library) {
           client.authenticate(function(error, client) {
             if(error) {
               client.reset();
+              console.log(error);
               return callback(error.description.replace(/\+/g, " "));
             }
 
             client.getDatastoreManager().openDefaultDatastore(function (error, datastore) {
-                if (error) {
+                if(error) {
+                  client.reset();
                   console.log(error);
                   return callback(error.description.replace(/\+/g, " "));
                 }
-                library.setDatastore(datastore);
+                deferredDatastore.resolve(datastore);
                 store.set("loggedin", true);
                 callback(null);
+            });
+
+            client.getAccountInfo(function(error, accountInfo) {
+              if(error) {
+                console.log(error);
+                return alert("Failed to retrieve account information!");
+              }
+
+              store.set("account", {name: accountInfo.name});
             });
           });
         }
@@ -237,52 +277,21 @@ app.service("dropbox", function($rootScope, library) {
         }
         client.signOut();
         store.remove("loggedin");
+        store.remove("account");
         callback();
       });
     },
-    buildLibrary: function(callback) {
-      var _this = this;
-      
-      this._search(function(error, files) {
-        if(error) return callback(error);
-        
-        var totalSongs = files.length;
-        _this._getUrls(files, function(error) {
-          callback(error);
-        });
-      });
-    },
-    _search: function(callback) {
-      client.search("/Music", "mp3", {limit: 999}, function(error, files) {
-        if(error) {
-          console.log(error);
-          return callback(error);
-        }
-        
-        console.log("Found", files.length, "songs");
-        callback(null, files);
-      });
-    },
-    _getUrls: function(files, callback) {
-      if(files.length === 0) {
-        console.log("_getUrls done!");
-        return callback();
-      }
-      var file = files.shift();
-      client.makeUrl(file.path, {download: true}, function(error, details) {
-        if(error) {
-          console.log(error);
-          return callback(error);
-        }
-        library.add(file.path, details.url);
-      });
-      this._getUrls(files, callback);
+    search: function(path, pattern, options, callback) {
+      client.search(path, pattern, options, callback);
     },
     getUrl: function(path, callback) {
       client.makeUrl(path, {download: true}, callback);
     },
     reset: function(callback) {
       client.getDatastoreManager().deleteDatastore("default", callback);
+    },
+    getAccountName: function() {
+      return this.isLoggedIn() ? store.get("account").name : "";
     }
   };
 });
@@ -371,6 +380,7 @@ app.controller("MainCtrl", function($scope, $location, $route, dropbox) {
     $location.path("/login");
   }
 
+  $scope.dropbox = dropbox;
   $scope.query = "";
   $scope.search = function() {
     $location.path("/search/"+$scope.query);
@@ -403,37 +413,18 @@ app.controller("LogoutCtrl", function($location, dropbox) {
     $location.path("/login");
   });
 });
-app.controller("BuildLibraryCtrl", function($scope, library, dropbox, lastfm) {
-  $scope.done = 1;
-  $scope.total = 100;
+app.controller("SettingsCtrl", function($scope, library, dropbox, lastfm) {
+  $scope.songsCount = library.getAllSongs().length;
   
-  $scope.build = function() {
-    $scope.msg = "Searching...";
-    dropbox.buildLibrary(function(msg) {
-      $scope.msg = msg;
+  $scope.scanDropbox = function() {
+    $scope.msg = "Scanning...";
+    library.scanDropbox();
+    $scope.$on("library.song.added", function() {
+      $scope.msg = library.getAllSongs().length + " songs added.";
     });
   };
 
-  $scope.loadImages = function() {
-    var albums = library.albums();
-    $scope.image_msg = "Loading...";
-    $scope.image_total = albums.length;
-    $scope.image_done = 0;
-    
-    for(var i=0, len=albums.length; i < len; i++) {
-      (function(album) {
-        lastfm.getAlbumImage(album.get("artist"), album.get("name"), function callback(error, image) {
-          if(error) album.set("image", "");
-          else album.set("image", image);
-          $scope.image_done++;
-          if($scope.image_done === $scope.image_total)
-            $scope.image_msg = "Done loading "+$scope.image_total+" images";
-        });
-      })(albums[i]);
-    }
-  };
-
-  $scope.reset = function() {
+  $scope.resetLibrary = function() {
     $scope.reset_msg = "Resetting...";
     dropbox.reset(function(error) {
       if(error) {
