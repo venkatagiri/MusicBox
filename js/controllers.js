@@ -210,7 +210,7 @@ angular
 
   $scope.play = function() {
     queue.clear();
-    queue.add(this.songs, this.$index);
+    queue.add(this.filteredSongs, this.$index);
   };
   $scope.addToQueue = function(song) {
     queue.add([song]);
