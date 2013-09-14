@@ -453,7 +453,7 @@ app.controller("SettingsCtrl", ["$scope", "library", "dropbox", "lastfm", functi
   };
 }]);
 app.controller("PlayerCtrl", ["$scope", "$timeout", "queue", "dropbox", function($scope, $timeout, queue, dropbox) {
-  $scope.audio = $("audio");
+  $scope.audio = document.querySelector("audio");
   $scope.volume = 4;
   $scope.audio.volume = $scope.volume * 0.1;
   $scope.src = "";
