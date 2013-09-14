@@ -22,18 +22,38 @@ angular
   var datastore = false,
     songs, albums, artists, genres;
   
-  function addSong(path, url) {
-    if(songs.query({path: path}).length > 0) return;
+  function addSong(file, url) {
+    var song = songs.query({path: file.path})[0];
+
+    // Song already exists. Delete older entries before song is added again.
+    if(song) {
+      if(songs.query({artist: song.get("artist")}).length === 1) {
+        artists.query({name: song.get("artist")})[0].deleteRecord();
+      }
+      if(songs.query({album: song.get("album")}).length === 1) {
+        albums.query({name: song.get("album")})[0].deleteRecord();
+      }
+      if(songs.query({genre: song.get("genre")}).length === 1) {
+        genres.query({name: song.get("genre")})[0].deleteRecord();
+      }
+      song.deleteRecord();
+    }
+
     ID3.loadTags(url, function() {
       var tags = ID3.getAllTags(url);
-      
+      tags.title = tags.title || file.path.split("/").pop().split(".").shift(); // If title is not found, use file name as song's name.
+      tags.album = tags.album || "Unknown Album";
+      tags.artist = tags.artist || "Unknown Artist";
+      tags.genre = tags.genre || "Unknown Genre";
+
       // Songs
       var song = songs.insert({
         name: tags.title,
         album: tags.album,
         artist: tags.artist,
         genre: tags.genre,
-        path: path
+        path: file.path,
+        version: file.versionTag
       });
 
       // Albums
@@ -117,17 +137,15 @@ angular
         console.log("Found", files.length, "songs");
         for(var i=0, len=files.length; i < len; i++) {
           (function(file) {
-            if(songs.query({path: file.path}).length > 0) return;
+            var song = songs.query({path: file.path})[0];
+            if(song && song.get("version") === file.versionTag) return; // If song version has not changed, don't index it again.
+
             dropbox.getUrl(file.path, function(error, details) {
               if(error) {
                 console.log(error);
                 return;
               }
-              try {
-                addSong(file.path, details.url);
-              } catch(e) {
-                console.log("File:", file.path, "Error:", e);
-              }
+              addSong(file, details.url);
             });
           })(files[i]);
         }
