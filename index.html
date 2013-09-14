@@ -57,7 +57,7 @@
   </div>
   
   <script type="text/ng-template" id="songs/list">
-    <h2>Songs</h2>
+    <h2 data-ng-show="!hideHeading">Songs</h2>
     <p data-ng-show="!songs.length">No Songs</p>
     <table class="pure-table pure-table-horizontal songs-list" data-ng-show="songs.length">
       <thead>
@@ -85,7 +85,7 @@
   </script>
 
   <script type="text/ng-template" id="albums/list">
-    <h2>Albums</h2>
+    <h2 data-ng-show="!hideHeading">Albums</h2>
     <p data-ng-show="!albums.length">No Albums</p>
     <ul class="cards" data-ng-show="albums.length">
       <li data-ng-repeat="album in (albums | orderBy:orderByName) track by $index" class="card card-album">
@@ -100,11 +100,11 @@
   <script type="text/ng-template" id="albums/show">
     <h2>{{album.get("name")}} - {{album.get("artist")}}</h2>
     <img src="{{album.get('image') || 'img/default_art.png'}}" />
-    <div data-ng-include="'songs/list'"></div>
+    <div data-ng-include="'songs/list'" data-ng-init="hideHeading=true"></div>
   </script>
 
   <script type="text/ng-template" id="artists/list">
-    <h2>Artists</h2>
+    <h2 data-ng-show="!hideHeading">Artists</h2>
     <p data-ng-show="!artists.length">No Artists</p>
     <ul class="cards" data-ng-show="artists.length">
       <li data-ng-repeat="artist in (artists | orderBy:orderByName) track by $index" class="card card-artist">
@@ -118,7 +118,7 @@
 
   <script type="text/ng-template" id="artists/show">
     <h2>{{artist.get("name")}}</h2>
-    <div data-ng-include="'albums/list'"></div>
+    <div data-ng-include="'albums/list'" data-ng-init="hideHeading=true"></div>
   </script>
 
   <script type="text/ng-template" id="genres/list">
@@ -136,7 +136,7 @@
 
   <script type="text/ng-template" id="genres/show">
     <h2>{{genre.get("name")}}</h2>
-    <div data-ng-include="'albums/list'"></div>
+    <div data-ng-include="'albums/list'" data-ng-init="hideHeading=true"></div>
   </script>
 
   <script type="text/ng-template" id="queue">
