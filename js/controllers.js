@@ -67,10 +67,12 @@ angular
   $scope.songsCount = library.getAllSongs().length;
   
   $scope.scanDropbox = function() {
+    var count = 0;
     $scope.msg = "Scanning...";
     library.scanDropbox();
     $scope.$on("library.song.added", function() {
-      $scope.msg = library.getAllSongs().length + " songs added.";
+      count++;
+      $scope.msg = count + " songs added.";
     });
   };
   $scope.resetLibrary = function() {
