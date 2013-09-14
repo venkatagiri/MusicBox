@@ -89,9 +89,9 @@ angular
 }])
 
 // Audio Player
-.controller("PlayerCtrl", ["$scope", "$timeout", "queue", "dropbox", function($scope, $timeout, queue, dropbox) {
+.controller("PlayerCtrl", ["$scope", "$timeout", "queue", "dropbox", "store", function($scope, $timeout, queue, dropbox, store) {
   $scope.audio = document.querySelector("audio");
-  $scope.volume = 4;
+  $scope.volume = store.get("volume") || 4;
   $scope.audio.volume = $scope.volume * 0.1;
   $scope.src = "";
   $scope.playing = false;
@@ -122,6 +122,7 @@ angular
     if($scope.volume + delta < 0 || $scope.volume + delta > 10) return;
     $scope.volume += delta;
     $scope.audio.volume = $scope.volume * 0.1;
+    store.set("volume", $scope.volume);
   };
   
   $scope.$on("song.change",  function() {
