@@ -98,7 +98,7 @@
   </script>
 
   <script type="text/ng-template" id="albums/show">
-    <h2>{{album.get("name")}} - {{album.get("artist")}}</h2>
+    <h2>{{album.get("name")}} - <a href="#/artist/{{album.get('artist')}}">{{album.get("artist")}}</a></h2>
     <img src="{{album.get('image') || 'img/default_art.png'}}" />
     <div data-ng-include="'songs/list'" data-ng-init="hideHeading=true"></div>
   </script>
