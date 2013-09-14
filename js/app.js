@@ -88,6 +88,22 @@ app.run(["$rootScope", "$location", "dropbox", function($rootScope, $location, d
   });
 }]);
 
+/* Wrapper service for localStorage, to allow object storage */
+app.service("store", function() {
+  return {
+    set: function(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    },
+    get: function(key) {
+      var value = localStorage.getItem(key);
+      return value && JSON.parse(value);
+    },
+    remove: function(key) {
+      localStorage.removeItem(key);
+    }
+  };
+});
+
 // Library Service
 app.service("library", ["$rootScope", "$q", "lastfm", "dropbox", function($rootScope, $q, lastfm, dropbox) {
   var datastore = false,
@@ -208,7 +224,7 @@ app.service("library", ["$rootScope", "$q", "lastfm", "dropbox", function($rootS
 }]);
 
 // Dropbox Service
-app.service("dropbox", ["$rootScope", "$q", function($rootScope, $q) {
+app.service("dropbox", ["$rootScope", "$q", "store", function($rootScope, $q, store) {
   var client = new Dropbox.Client({ key: "rkii6jl2u8un1xc" }),
     deferredDatastore = $q.defer();
 
