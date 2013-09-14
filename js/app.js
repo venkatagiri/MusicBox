@@ -2,7 +2,7 @@
 var app = angular.module("app", []);
 
 // Routes
-app.config(function($routeProvider) {
+app.config(["$routeProvider", function($routeProvider) {
   // A Promise to stop Controller execution till the dependency(Library) is loaded.
   var resolveLibrary = {
     'Library': function(library) {
@@ -24,10 +24,10 @@ app.config(function($routeProvider) {
   .when("/queue", { templateUrl: "queue", controller: "QueueCtrl", resolve: resolveLibrary })
   .when("/search/:query", { templateUrl: "search", controller: "SearchCtrl", resolve: resolveLibrary })
   .otherwise({redirectTo: "/login"});
-});
+}]);
 
 // Directive for highlighting the active nav link
-app.directive("activeLink", function($location) {
+app.directive("activeLink", ["$location", function($location) {
   return {
     restrict: "A",
     link: function(scope, element, attrs, controller) {
@@ -42,7 +42,7 @@ app.directive("activeLink", function($location) {
       });
     }
   };
-});
+}]);
 
 // Filters
 app.filter("name", function() {
@@ -69,14 +69,14 @@ app.filter("song", function() {
     return output;
   };
 });
-app.run(function($rootScope) {
+app.run(["$rootScope", function($rootScope) {
   $rootScope.orderByName = function(record) {
     return record.get("name");
   };
-});
+}]);
 
 // Authentication Check
-app.run(function($rootScope, $location, dropbox) {
+app.run(["$rootScope", "$location", "dropbox", function($rootScope, $location, dropbox) {
   $rootScope.$on("$locationChangeStart", function(event, next, current) {
     if(!dropbox.isLoggedIn()) {
       if (next.split("#")[1] !== "/login") {
@@ -86,10 +86,10 @@ app.run(function($rootScope, $location, dropbox) {
       $location.path("/songs");
     }
   });
-});
+}]);
 
 // Library Service
-app.service("library", function($rootScope, $q, lastfm, dropbox) {
+app.service("library", ["$rootScope", "$q", "lastfm", "dropbox", function($rootScope, $q, lastfm, dropbox) {
   var datastore = false,
     songs, albums, artists, genres;
   
@@ -205,12 +205,13 @@ app.service("library", function($rootScope, $q, lastfm, dropbox) {
       });
     }
   };
-});
+}]);
 
 // Dropbox Service
-app.service("dropbox", function($rootScope, $q) {
+app.service("dropbox", ["$rootScope", "$q", function($rootScope, $q) {
   var client = new Dropbox.Client({ key: "rkii6jl2u8un1xc" }),
     deferredDatastore = $q.defer();
+
   client.authDriver(new Dropbox.AuthDriver.Popup({
     receiverUrl: location.origin + location.pathname + "oauth_receiver.html"
   }));
@@ -294,10 +295,10 @@ app.service("dropbox", function($rootScope, $q) {
       return this.isLoggedIn() ? store.get("account").name : "";
     }
   };
-});
+}]);
 
 // LastFM Service
-app.service("lastfm", function($rootScope) {
+app.service("lastfm", ["$rootScope", function($rootScope) {
   var lastfm = new LastFM({
     apiKey    : 'd8f190ffa963f1611d8b09478b6fd99a',
     apiSecret : 'af524e1751eeabc345b5b47b0a8203fa'
@@ -325,10 +326,10 @@ app.service("lastfm", function($rootScope) {
       });
     }
   };
-});
+}]);
 
 // Queue Service
-app.service("queue", function($rootScope) {
+app.service("queue", ["$rootScope", function($rootScope) {
   var _songs = [],
     _index = -1;
 
@@ -367,10 +368,10 @@ app.service("queue", function($rootScope) {
       $rootScope.$broadcast("song.change");
     }
   };
-});
+}]);
 
 // Controllers
-app.controller("MainCtrl", function($scope, $location, $route, dropbox) {
+app.controller("MainCtrl", ["$scope", "$location", "$route", "dropbox", function($scope, $location, $route, dropbox) {
   if(dropbox.isLoggedIn()) {
     $scope.$on("datastore.loaded",  function() {
       document.body.classList.remove("loading");
@@ -392,8 +393,8 @@ app.controller("MainCtrl", function($scope, $location, $route, dropbox) {
       $scope.query = "";
     }
   });
-});
-app.controller("LoginCtrl", function($scope, $location, dropbox) {
+}]);
+app.controller("LoginCtrl", ["$scope", "$location", "dropbox", function($scope, $location, dropbox) {
   $scope.login = function() {
     $scope.loggingIn = true;
     $scope.error = "";
@@ -407,13 +408,13 @@ app.controller("LoginCtrl", function($scope, $location, dropbox) {
       }
     });
   };
-});
-app.controller("LogoutCtrl", function($location, dropbox) {
+}]);
+app.controller("LogoutCtrl", ["$location", "dropbox", function($location, dropbox) {
   dropbox.logout(function() {
     $location.path("/login");
   });
-});
-app.controller("SettingsCtrl", function($scope, library, dropbox, lastfm) {
+}]);
+app.controller("SettingsCtrl", ["$scope", "library", "dropbox", "lastfm", function($scope, library, dropbox, lastfm) {
   $scope.songsCount = library.getAllSongs().length;
   
   $scope.scanDropbox = function() {
@@ -423,7 +424,6 @@ app.controller("SettingsCtrl", function($scope, library, dropbox, lastfm) {
       $scope.msg = library.getAllSongs().length + " songs added.";
     });
   };
-
   $scope.resetLibrary = function() {
     $scope.reset_msg = "Resetting...";
     dropbox.reset(function(error) {
@@ -435,9 +435,8 @@ app.controller("SettingsCtrl", function($scope, library, dropbox, lastfm) {
       }
     });
   };
-
-});
-app.controller("PlayerCtrl", function($scope, $timeout, queue, dropbox) {
+}]);
+app.controller("PlayerCtrl", ["$scope", "$timeout", "queue", "dropbox", function($scope, $timeout, queue, dropbox) {
   $scope.audio = $("audio");
   $scope.volume = 4;
   $scope.audio.volume = $scope.volume * 0.1;
@@ -466,6 +465,11 @@ app.controller("PlayerCtrl", function($scope, $timeout, queue, dropbox) {
     $scope.pause();
     queue.previousSong();
   };
+  $scope.changeVolume = function(delta) {
+    if($scope.volume + delta < 0 || $scope.volume + delta > 10) return;
+    $scope.volume += delta;
+    $scope.audio.volume = $scope.volume * 0.1;
+  };
   
   $scope.$on("song.change",  function() {
     var song = queue.currentSong();
@@ -485,12 +489,6 @@ app.controller("PlayerCtrl", function($scope, $timeout, queue, dropbox) {
       $scope.play();
     }
   });
-  
-  $scope.changeVolume = function(delta) {
-    if($scope.volume + delta < 0 || $scope.volume + delta > 10) return;
-    $scope.volume += delta;
-    $scope.audio.volume = $scope.volume * 0.1;
-  };
 
   (function update() {
     $scope.progress = ($scope.audio.currentTime/$scope.audio.duration) * 100;
@@ -508,8 +506,8 @@ app.controller("PlayerCtrl", function($scope, $timeout, queue, dropbox) {
       queue.nextSong();
     }
   }, false);
-});
-app.controller("SearchCtrl", function($scope, $routeParams, $filter, library, queue) {
+}]);
+app.controller("SearchCtrl", ["$scope", "$routeParams", "$filter", "library", "queue", function($scope, $routeParams, $filter, library, queue) {
   $scope.songs = $filter("song")(library.getAllSongs(), $routeParams.query);
   $scope.albums = $filter("name")(library.getAllAlbums(), $routeParams.query);
   $scope.artists = $filter("name")(library.getAllArtists(), $routeParams.query);
@@ -518,27 +516,25 @@ app.controller("SearchCtrl", function($scope, $routeParams, $filter, library, qu
     queue.clear();
     queue.add(this.filteredSongs, this.$index);
   };
-
   $scope.addToQueue = function(song) {
     queue.add([song]);
   };
-});
-app.controller("SongsListCtrl", function($scope, queue, library) {
+}]);
+app.controller("SongsListCtrl", ["$scope", "queue", "library", function($scope, queue, library) {
   $scope.songs = library.getAllSongs();
  
   $scope.play = function() {
     queue.clear();
     queue.add(this.filteredSongs, this.$index);
   };
-
   $scope.addToQueue = function(song) {
     queue.add([song]);
   };
-});
-app.controller("AlbumsListCtrl", function($scope, library) {
+}]);
+app.controller("AlbumsListCtrl", ["$scope", "library", function($scope, library) {
   $scope.albums = library.getAllAlbums();
-});
-app.controller("AlbumsShowCtrl", function($scope, $routeParams, library, queue) {
+}]);
+app.controller("AlbumsShowCtrl", ["$scope", "$routeParams", "library", "queue", function($scope, $routeParams, library, queue) {
   $scope.album = library.getAlbums({name: $routeParams.album, artist: $routeParams.artist})[0];
   $scope.songs = library.getSongs({album: $routeParams.album, artist: $routeParams.artist});
 
@@ -546,26 +542,25 @@ app.controller("AlbumsShowCtrl", function($scope, $routeParams, library, queue) 
     queue.clear();
     queue.add(this.songs, this.$index);
   };
-  
   $scope.addToQueue = function(song) {
     queue.add([song]);
   };
-});
-app.controller("ArtistsListCtrl", function($scope, library) {
+}]);
+app.controller("ArtistsListCtrl", ["$scope", "library", function($scope, library) {
   $scope.artists = library.getAllArtists();
-});
-app.controller("ArtistsShowCtrl", function($scope, $routeParams, library) {
+}]);
+app.controller("ArtistsShowCtrl", ["$scope", "$routeParams", "library", function($scope, $routeParams, library) {
   $scope.artist = library.getArtists({name: $routeParams.artist})[0];
   $scope.albums = library.getAlbums({artist: $routeParams.artist});
-});
-app.controller("GenresListCtrl", function($scope, library) {
+}]);
+app.controller("GenresListCtrl", ["$scope", "library", function($scope, library) {
   $scope.genres = library.getAllGenres();
-});
-app.controller("GenresShowCtrl", function($scope, $routeParams, library) {
+}]);
+app.controller("GenresShowCtrl", ["$scope", "$routeParams", "library", function($scope, $routeParams, library) {
   $scope.genre = library.getGenres({name: $routeParams.genre})[0];
   $scope.albums = library.getAlbums({genre: $routeParams.genre});
-});
-app.controller("QueueCtrl", function($scope, queue) {
+}]);
+app.controller("QueueCtrl", ["$scope", "queue", function($scope, queue) {
   $scope.songs = queue.songs();
   $scope.nowPlaying = queue.index();
 
@@ -575,4 +570,4 @@ app.controller("QueueCtrl", function($scope, queue) {
   $scope.$on("song.change", function() {
     $scope.nowPlaying = queue.index();
   });
-});
+}]);
