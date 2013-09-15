@@ -39,10 +39,12 @@ h1 {
   font-weight: normal;
 }
 h2 {
+  font-size: 1.8em;
   font-weight: normal;
   margin: 0 0 10px 0;
 }
 h3 {
+  color: #e62020;
   font-weight: normal;
   margin: 0 0 10px 0;
 }
@@ -161,6 +163,9 @@ h3 {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.current-song .scrobbled {
+  color: #e62020;
 }
 
 .progress {

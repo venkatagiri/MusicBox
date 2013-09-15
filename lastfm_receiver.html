@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script>
+      window.addEventListener("load", function() {
+        window.opener.lastfmCallback(window.location.search.substring(1).split("=")[1]);
+        window.close();
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Last.fm sign-in successful</h1>
+    <p>Please close this window.</p>
+  </body>
+</html>

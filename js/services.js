@@ -245,13 +245,39 @@ angular
 }])
 
 // LastFM Service
-.service("lastfm", ["$rootScope", function($rootScope) {
-  var lastfm = new LastFM({
-    apiKey    : 'd8f190ffa963f1611d8b09478b6fd99a',
-    apiSecret : 'af524e1751eeabc345b5b47b0a8203fa'
+.service("lastfm", ["$rootScope", "$route", "store", function($rootScope, $route, store) {
+  var API_KEY = "d8f190ffa963f1611d8b09478b6fd99a",
+    API_SECRET = "af524e1751eeabc345b5b47b0a8203fa",
+    lastfm;
+  
+  lastfm = new LastFM({
+    apiKey    : API_KEY,
+    apiSecret : API_SECRET
   });
 
   return {
+    isLoggedIn: function() {
+      return !!store.get("lastfm.name");
+    },
+    login: function() {
+      window.lastfmCallback = this.callback;
+      window.open("http://www.last.fm/api/auth?api_key="+API_KEY, "Log into Last.fm", "location=0,status=0,width=800,height=400");
+    },
+    callback: function(token) {
+      lastfm.auth.getSession({api_key: API_KEY, token: token}, {
+        success: function(data) {
+          store.set("lastfm.name", data.session.name);
+          store.set("lastfm.key", data.session.key);
+          $route.reload();
+        },
+        error: function(code, message) {
+          console.log(code, message);
+        }
+      });
+    },
+    getName: function() {
+      return store.get("lastfm.name");
+    },
     getArtistImage: function(name, callback) {
       lastfm.artist.getInfo({artist: name}, {
         success: function(data) {
@@ -271,7 +297,40 @@ angular
           callback(message);
         }
       });
-    }
+    },
+    nowPlaying: function(song) {
+      lastfm.track.updateNowPlaying({
+        artist: song.get("artist"),
+        track: song.get("name"),
+        album: song.get("album")
+      }, {
+        key: store.get("lastfm.key")
+      }, {
+        success: function(data) {
+          console.log("Now Playing:", song.get("name"));
+        },
+        error: function(code, message) {
+          console.error("LastFM: Error:", code, message);
+        }
+      });
+    },
+    scrobble: function(song) {
+      lastfm.track.scrobble({
+        artist: song.get("artist"),
+        track: song.get("name"),
+        album: song.get("album"),
+        timestamp: Math.floor(Date.now()/1000)
+      }, {
+        key: store.get("lastfm.key")
+      }, {
+        success: function(data) {
+          console.log("Scrobbled:", song.get("name"));
+        },
+        error: function(code, message) {
+          console.error("LastFM: Error:", code, message);
+        }
+      });
+    },
   };
 }])
 

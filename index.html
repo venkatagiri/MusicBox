@@ -51,7 +51,10 @@
       <button data-ng-click="changeVolume(+1)">+</button>
     </div>
     <div class="current-song">
-      <div data-col="name" title="{{song.get('name')}}">{{song.get("name")}}</div>
+      <div data-col="name" title="{{song.get('name')}}">
+        {{song.get("name")}}
+        <span data-ng-show="scrobbled" class="scrobbled" title="Scrobbled!">✓</span>
+      </div>
       <div data-col="artist" title="{{song.get('artist')}}">{{song.get("artist")}}</div>
     </div>
   </div>
@@ -193,15 +196,25 @@
   
   <script type="text/ng-template" id="settings">
     <h2>Settings</h2>
+
+    <h3>Music Library</h3>
     <p>Number of songs in your Dropbox: <strong>{{songsCount}}</strong></p>
     <p>
       <button class="pure-button pure-button-primary" data-ng-click="scanDropbox()">Scan Dropbox</button>
       <span>{{msg || "Finds all audio files in your Dropbox and builds the Music Library."}}</span>
     </p>
-
     <p>
       <button class="pure-button pure-button-primary" data-ng-click="resetLibrary()">Reset Music Library</button>
       <span>{{reset_msg || "Resets the Music Library(Your audio files will not be deleted)."}}</span>
+    </p>
+
+    <h3>Last.fm</h3>
+    <p data-ng-show="!lastfmName">
+      <button class="pure-button pure-button-primary" data-ng-click="logIntoLastfm()">Login to Last.fm</button>
+      <span>Scrobble the music you listen to.</span>
+    </p>
+    <p data-ng-show="lastfmName">
+      <span>Scrobbling as <a href="http://www.last.fm/user/{{lastfmName}}" target="_blank">{{lastfmName}}</a>.</span>
     </p>
   </script>
 

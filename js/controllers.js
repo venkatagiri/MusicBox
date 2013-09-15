@@ -63,8 +63,9 @@ angular
 }])
 
 // Settings
-.controller("SettingsCtrl", ["$scope", "library", "dropbox", "lastfm", function($scope, library, dropbox, lastfm) {
+.controller("SettingsCtrl", ["$scope", "$route", "library", "dropbox", "lastfm", function($scope, $route, library, dropbox, lastfm) {
   $scope.songsCount = library.getAllSongs().length;
+  $scope.lastfmName = lastfm.getName();
   
   $scope.scanDropbox = function() {
     var count = 0;
@@ -86,15 +87,19 @@ angular
       }
     });
   };
+  $scope.logIntoLastfm = function() {
+    lastfm.login();
+  };
 }])
 
 // Audio Player
-.controller("PlayerCtrl", ["$scope", "$timeout", "queue", "dropbox", "store", function($scope, $timeout, queue, dropbox, store) {
+.controller("PlayerCtrl", ["$scope", "$timeout", "queue", "dropbox", "store", "lastfm", function($scope, $timeout, queue, dropbox, store, lastfm) {
   $scope.audio = document.querySelector("audio");
   $scope.volume = store.get("volume") || 4;
   $scope.audio.volume = $scope.volume * 0.1;
   $scope.src = "";
   $scope.playing = false;
+  $scope.scrobbled = false;
   
   var urlCache = [];
   
@@ -131,21 +136,29 @@ angular
     
     $scope.pause();
     $scope.song = song;
+    $scope.scrobbled = false;
     if(!urlCache[song.get('path')]) {
       dropbox.getUrl(song.get('path'), function(error, details) {
         if(error) return console.log(error);
         
         $scope.src = urlCache[song.get('path')] = details.url;
         $scope.play();
+        if(lastfm.isLoggedIn()) lastfm.nowPlaying($scope.song);
       });
     } else {
-      $scope.src = urlCache[song.path];
+      $scope.src = urlCache[song.get('path')];
       $scope.play();
     }
   });
 
   (function update() {
     $scope.progress = ($scope.audio.currentTime/$scope.audio.duration) * 100;
+
+    // Scrobble to Last.fm if song has been played for at least half its duration, or for 4 minutes.
+    if(lastfm.isLoggedIn() && !$scope.scrobbled && ($scope.progress > 50 || $scope.audio.currentTime > 240)) {
+      $scope.scrobbled = true;
+      lastfm.scrobble($scope.song);
+    }
     $timeout(update, 30);
   })();
   
