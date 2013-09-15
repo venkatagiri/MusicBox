@@ -36,7 +36,7 @@
   </div>
 
   <div class="player" data-ng-controller="PlayerCtrl">
-    <audio src="{{src}}" autoplay></audio>
+    <audio data-ng-src="{{src}}" autoplay></audio>
 
     <div class="progress" style="width: {{progress}}%"></div>
     <div class="controls">
@@ -90,7 +90,7 @@
     <ul class="cards" data-ng-show="albums.length">
       <li data-ng-repeat="album in (albums | orderBy:orderByName) track by $index" class="card card-album">
         <a href="#/artist/{{album.get('artist')}}/album/{{album.get('name')}}" title="{{album.get('name')}}">
-          <img src="{{album.get('image') || 'img/default_art.png'}}" />
+          <img data-ng-src="{{album.get('image') || 'img/default_art.png'}}" />
           <p class="title">{{album.get("name")}}</p>
         </a>
       </li>
@@ -99,7 +99,7 @@
 
   <script type="text/ng-template" id="albums/show">
     <h2>{{album.get("name")}} - <a href="#/artist/{{album.get('artist')}}">{{album.get("artist")}}</a></h2>
-    <img src="{{album.get('image') || 'img/default_art.png'}}" />
+    <img data-ng-src="{{album.get('image') || 'img/default_art.png'}}" />
     <div data-ng-include="'songs/list'" data-ng-init="hideHeading=true"></div>
   </script>
 
@@ -109,7 +109,7 @@
     <ul class="cards" data-ng-show="artists.length">
       <li data-ng-repeat="artist in (artists | orderBy:orderByName) track by $index" class="card card-artist">
         <a href="#/artist/{{artist.get('name')}}" title="{{artist.get('name')}}">
-          <img src="{{artist.get('image') || 'img/default_art.png'}}" />
+          <img data-ng-src="{{artist.get('image') || 'img/default_art.png'}}" />
           <p class="title">{{artist.get("name")}}</p>
         </a>
       </li>
