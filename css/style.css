@@ -3,6 +3,7 @@ body {
   color: #333;
   background: #f0f0f0;
   -webkit-user-select: none;
+  min-width: 980px;
 }
 body.loading::after {
   content: '';
@@ -43,6 +44,7 @@ h2 {
 }
 h3 {
   font-weight: normal;
+  margin: 0 0 10px 0;
 }
 
 .search-form {
@@ -55,7 +57,7 @@ h3 {
 
 .links {
   float: right;
-  padding: 15px 50px 0;
+  padding: 15px 50px 0 15px;
 }
 .links .name {
   color: #e62020;
@@ -85,7 +87,7 @@ h3 {
 }
 #nav .pure-menu-heading {
   margin: 0;
-  padding-top: 15px;
+  padding-top: 20px;
   border-bottom: 0;
   font-size: 100%;
   color: #e62020;
@@ -204,7 +206,6 @@ h3 {
   text-align: center;
 }
 .songs-list [data-col=artist], .songs-list [data-col=album] {
-  width: 250px;
   max-width: 250px;
   white-space: nowrap;
   overflow: hidden;

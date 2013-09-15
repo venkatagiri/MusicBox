@@ -163,11 +163,21 @@
   </script>
 
   <script type="text/ng-template" id="search">
+    <h2>Results</h2>
     <p data-ng-show="!songs.length && !albums.length && !artists.length">No results found</p>
     <div class="results">
-      <div data-ng-include="'artists/list'" data-ng-show="artists.length"></div>
-      <div data-ng-include="'albums/list'" data-ng-show="albums.length"></div>
-      <div data-ng-include="'songs/list'" data-ng-show="songs.length"></div>
+      <div data-ng-show="artists.length">
+        <h3>Artists</h3>
+        <div data-ng-include="'artists/list'" data-ng-init="hideHeading=true"></div>
+      </div>
+      <div data-ng-show="albums.length">
+        <h3>Albums</h3>
+        <div data-ng-include="'albums/list'" data-ng-init="hideHeading=true"></div>
+      </div>
+      <div data-ng-show="songs.length">
+        <h3>Songs</h3>
+        <div data-ng-include="'songs/list'" data-ng-init="hideHeading=true"></div>
+      </div>
     </div>
   </script>
 
