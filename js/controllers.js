@@ -109,6 +109,7 @@ angular
     } else {
       $scope.audio.play();
       $scope.playing = true;
+      updateProgressBar();
     }
   };
   $scope.pause = function() {
@@ -151,7 +152,7 @@ angular
     }
   });
 
-  (function update() {
+  function updateProgressBar() {
     $scope.progress = ($scope.audio.currentTime/$scope.audio.duration) * 100;
 
     // Scrobble to Last.fm if song has been played for at least half its duration, or for 4 minutes.
@@ -159,8 +160,8 @@ angular
       $scope.scrobbled = true;
       lastfm.scrobble($scope.song);
     }
-    $timeout(update, 30);
-  })();
+    if($scope.playing) $timeout(updateProgressBar, 100);
+  };
   
   $scope.audio.addEventListener("ended", function() { $scope.next(); }, false);
   document.addEventListener("keypress", function(e) {

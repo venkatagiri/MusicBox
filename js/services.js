@@ -171,7 +171,9 @@ angular
           alert("Error opening default datastore: " + error);
           return;
         }
-        deferredDatastore.resolve(datastore);
+        $rootScope.$apply(function() {
+          deferredDatastore.resolve(datastore);
+        });
     });
   });
 
@@ -199,8 +201,10 @@ angular
                   console.log(error);
                   return callback(error.description.replace(/\+/g, " "));
                 }
-                deferredDatastore.resolve(datastore);
-                store.set("loggedin", true);
+                $rootScope.$apply(function() {
+                  deferredDatastore.resolve(datastore);
+                  store.set("loggedin", true);
+                });
                 callback(null);
             });
 
