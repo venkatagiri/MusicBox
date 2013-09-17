@@ -137,7 +137,9 @@ angular
     
     $scope.pause();
     $scope.song = song;
+    $scope.src = "";
     $scope.scrobbled = false;
+    
     if(!urlCache[song.get('path')]) {
       dropbox.getUrl(song.get('path'), function(error, details) {
         if(error) return console.log(error);
@@ -241,6 +243,15 @@ angular
 .controller("ArtistsShowCtrl", ["$scope", "$routeParams", "library", function($scope, $routeParams, library) {
   $scope.artist = library.getArtists({name: $routeParams.artist})[0];
   $scope.albums = library.getAlbums({artist: $routeParams.artist});
+  $scope.songs = library.getSongs({artist: $routeParams.artist});
+
+  $scope.play = function() {
+    queue.clear();
+    queue.add(this.filteredSongs, this.$index);
+  };
+  $scope.addToQueue = function(song) {
+    queue.add([song]);
+  };
 }])
 
 // Genres

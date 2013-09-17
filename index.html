@@ -101,8 +101,9 @@
   </script>
 
   <script type="text/ng-template" id="albums/show">
-    <h2>{{album.get("name")}} - <a href="#/artist/{{album.get('artist')}}">{{album.get("artist")}}</a></h2>
-    <img data-ng-src="{{album.get('image') || 'img/default_art.png'}}" />
+    <img data-ng-src="{{album.get('image') || 'img/default_art.png'}}" class="album-image"/>
+    <h2>{{album.get("name")}}</h2>
+    <h3><a href="#/artist/{{album.get('artist')}}">{{album.get("artist")}}</a></h3>
     <div data-ng-include="'songs/list'" data-ng-init="hideHeading=true"></div>
   </script>
 
@@ -121,7 +122,10 @@
 
   <script type="text/ng-template" id="artists/show">
     <h2>{{artist.get("name")}}</h2>
+    <h3>Albums</h3>
     <div data-ng-include="'albums/list'" data-ng-init="hideHeading=true"></div>
+    <h3>Songs</h3>
+    <div data-ng-include="'songs/list'" data-ng-init="hideHeading=true"></div>
   </script>
 
   <script type="text/ng-template" id="genres/list">

@@ -262,3 +262,8 @@ h3 {
 .card-artist {
   width: 126px;
 }
+
+.album-image, .artist-image {
+  float: left;
+  margin: 0 20px 20px 0;
+}
