@@ -3,7 +3,11 @@
   <head>
     <script src="js/lib/dropbox-datastores-0.1.0-b6.js"></script>
     <script>
-      Dropbox.AuthDriver.Popup.oauthReceiver();
+      if(location.protocol === "https:") {
+        location.href = location.href.replace(/^https/, "http");
+      } else {
+        Dropbox.AuthDriver.Popup.oauthReceiver();
+      }
     </script>
   </head>
   <body>
