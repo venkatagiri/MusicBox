@@ -240,7 +240,7 @@ angular
 .controller("ArtistsListCtrl", ["$scope", "library", function($scope, library) {
   $scope.artists = library.getAllArtists();
 }])
-.controller("ArtistsShowCtrl", ["$scope", "$routeParams", "library", function($scope, $routeParams, library) {
+.controller("ArtistsShowCtrl", ["$scope", "$routeParams", "library", "queue", function($scope, $routeParams, library, queue) {
   $scope.artist = library.getArtists({name: $routeParams.artist})[0];
   $scope.albums = library.getAlbums({artist: $routeParams.artist});
   $scope.songs = library.getSongs({artist: $routeParams.artist});
