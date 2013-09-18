@@ -160,7 +160,7 @@ angular
     deferredDatastore = $q.defer();
 
   client.authDriver(new Dropbox.AuthDriver.Popup({
-    receiverUrl: location.origin.replace(/^https/, "http") + location.pathname + "oauth_receiver.html"
+    receiverUrl: location.origin.replace(/^http/, "https") + location.pathname + "oauth_receiver.html"
   }));
   client.authenticate({interactive: false}, function() {
     if(!client.isAuthenticated()) return;
