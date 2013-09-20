@@ -248,8 +248,39 @@ angular
   };
 }])
 
+// Settings Service (synced with Dropbox)
+.service("settings", ["dropbox", function(dropbox) {
+  var settings;
+
+  dropbox.datastoreLoaded.then(function(ds) {
+    settings = ds.getTable("settings");
+  });
+
+  return {
+    set: function(key, value) {
+      var setting = settings.query({key: key})[0];
+      if(setting) {
+        setting.set("value", value);
+      } else {
+        settings.insert({
+          key: key,
+          value: value
+        });
+      }
+    },
+    get: function(key) {
+      var setting = settings.query({key: key})[0];
+      return setting ? setting.get("value") : null;
+    },
+    remove: function(key) {
+      var setting = settings.query({key: key})[0];
+      if(setting) setting.deleteRecord();
+    }
+  };
+}])
+
 // LastFM Service
-.service("lastfm", ["$rootScope", "$route", "store", function($rootScope, $route, store) {
+.service("lastfm", ["$rootScope", "$route", "settings", function($rootScope, $route, settings) {
   var API_KEY = "d8f190ffa963f1611d8b09478b6fd99a",
     API_SECRET = "af524e1751eeabc345b5b47b0a8203fa",
     lastfm;
@@ -261,7 +292,7 @@ angular
 
   return {
     isLoggedIn: function() {
-      return !!store.get("lastfm.name");
+      return !!settings.get("lastfm.name");
     },
     login: function() {
       window.lastfmCallback = this.callback;
@@ -270,8 +301,8 @@ angular
     callback: function(token) {
       lastfm.auth.getSession({api_key: API_KEY, token: token}, {
         success: function(data) {
-          store.set("lastfm.name", data.session.name);
-          store.set("lastfm.key", data.session.key);
+          settings.set("lastfm.name", data.session.name);
+          settings.set("lastfm.key", data.session.key);
           $route.reload();
         },
         error: function(code, message) {
@@ -280,7 +311,7 @@ angular
       });
     },
     getName: function() {
-      return store.get("lastfm.name");
+      return settings.get("lastfm.name");
     },
     getArtistImage: function(name, callback) {
       lastfm.artist.getInfo({artist: name}, {
@@ -308,7 +339,7 @@ angular
         track: song.get("name"),
         album: song.get("album")
       }, {
-        key: store.get("lastfm.key")
+        key: settings.get("lastfm.key")
       }, {
         success: function(data) {
           console.log("Now Playing:", song.get("name"));
@@ -325,7 +356,7 @@ angular
         album: song.get("album"),
         timestamp: Math.floor(Date.now()/1000)
       }, {
-        key: store.get("lastfm.key")
+        key: settings.get("lastfm.key")
       }, {
         success: function(data) {
           console.log("Scrobbled:", song.get("name"));
