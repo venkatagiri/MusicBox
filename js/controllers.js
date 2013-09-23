@@ -158,7 +158,7 @@ angular
     $scope.progress = ($scope.audio.currentTime/$scope.audio.duration) * 100;
 
     // Scrobble to Last.fm if song has been played for at least half its duration, or for 4 minutes.
-    if(lastfm.isLoggedIn() && !$scope.scrobbled && ($scope.progress > 50 || $scope.audio.currentTime > 240)) {
+    if(lastfm.isLoggedIn() && $scope.playing && !$scope.scrobbled && ($scope.progress > 50 || $scope.audio.currentTime > 240)) {
       $scope.scrobbled = true;
       lastfm.scrobble($scope.song);
     }
