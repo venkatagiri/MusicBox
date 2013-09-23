@@ -44,13 +44,15 @@ angular
     $scope.loggingIn = true;
     $scope.error = "";
     dropbox.login(function(error) {
-      $scope.loggingIn = false;
-      if(error) {
-        console.log(error);
-        $scope.error = error;
-      } else {
-        $location.path("/songs");
-      }
+      $scope.$apply(function() {
+        $scope.loggingIn = false;
+        if(error) {
+          console.log(error);
+          $scope.error = error;
+        } else {
+          $location.path("/songs");
+        }
+      });
     });
   };
 }])
@@ -58,7 +60,9 @@ angular
 // Logout
 .controller("LogoutCtrl", ["$location", "dropbox", function($location, dropbox) {
   dropbox.logout(function() {
-    $location.path("/login");
+    $scope.$apply(function() {
+      $location.path("/login");
+    });
   });
 }])
 
