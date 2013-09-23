@@ -149,7 +149,6 @@ h3 {
 
 .current-song {
   float: left;
-  width: 230px;
   padding: 10px;
 }
 .current-song div[data-col=name] {
