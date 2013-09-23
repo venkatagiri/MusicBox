@@ -131,7 +131,7 @@ angular
       dropbox.search("/", "mp3", {limit: 999}, function(error, files) {
         if(error) {
           console.log(error);
-          return callback(-1);
+          return;
         }
         
         console.log("Found", files.length, "songs");
@@ -186,7 +186,7 @@ angular
       client.authenticate({interactive: false}, function(error, client) {
         if(client.isAuthenticated()) {
           store.set("loggedin", true);
-          callback(null);
+          callback();
         } else {
           client.authenticate(function(error, client) {
             if(error) {
@@ -205,7 +205,7 @@ angular
                   deferredDatastore.resolve(datastore);
                   store.set("loggedin", true);
                 });
-                callback(null);
+                callback();
             });
 
             client.getAccountInfo(function(error, accountInfo) {
@@ -303,7 +303,9 @@ angular
         success: function(data) {
           settings.set("lastfm.name", data.session.name);
           settings.set("lastfm.key", data.session.key);
-          $route.reload();
+          $rootScope.$apply(function() {
+            $route.reload();
+          });
         },
         error: function(code, message) {
           console.log(code, message);
