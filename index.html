@@ -143,7 +143,10 @@
 
   <script type="text/ng-template" id="genres/show">
     <h2>{{genre.get("name")}}</h2>
+    <h3>Albums</h3>
     <div data-ng-include="'albums/list'" data-ng-init="hideHeading=true"></div>
+    <h3>Songs</h3>
+    <div data-ng-include="'songs/list'" data-ng-init="hideHeading=true"></div>
   </script>
 
   <script type="text/ng-template" id="queue">

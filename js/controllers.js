@@ -262,7 +262,17 @@ angular
 .controller("GenresListCtrl", ["$scope", "library", function($scope, library) {
   $scope.genres = library.getAllGenres();
 }])
-.controller("GenresShowCtrl", ["$scope", "$routeParams", "library", function($scope, $routeParams, library) {
+.controller("GenresShowCtrl", ["$scope", "$routeParams", "library", "queue", function($scope, $routeParams, library, queue) {
   $scope.genre = library.getGenres({name: $routeParams.genre})[0];
   $scope.albums = library.getAlbums({genre: $routeParams.genre});
+  $scope.songs = library.getSongs({genre: $routeParams.genre});
+
+  $scope.play = function() {
+    queue.clear();
+    queue.add(this.filteredSongs, this.$index);
+  };
+  $scope.addToQueue = function(song) {
+    queue.add([song]);
+  };
 }]);
+
