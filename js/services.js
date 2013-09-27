@@ -39,7 +39,7 @@ angular
       song.deleteRecord();
     }
 
-    ID3.loadTags(url, function() {
+    ID3.loadTags(url, file.size, function() {
       var tags = ID3.getAllTags(url);
       tags.title = tags.title || file.path.split("/").pop().split(".").shift(); // If title is not found, use file name as song's name.
       tags.album = tags.album || "Unknown Album";
