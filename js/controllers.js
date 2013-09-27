@@ -76,8 +76,10 @@ angular
     $scope.msg = "Scanning...";
     library.scanDropbox();
     $scope.$on("library.song.added", function() {
-      count++;
-      $scope.msg = count + " songs added.";
+      $scope.$apply(function() {
+        count++;
+        $scope.msg = count + " songs added.";
+      });
     });
   };
   $scope.resetLibrary = function() {
