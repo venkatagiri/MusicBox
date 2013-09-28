@@ -10,8 +10,7 @@ angular
         $rootScope.$apply();
       }
     } else if(next.split("#")[1] === "/login") {
-      $location.path("/songs");
-      $rootScope.$apply();
+      event.preventDefault(); // Do not allow navigation to login if already logged in.
     }
   });
 }])
