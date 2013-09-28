@@ -127,6 +127,8 @@ h3 {
 .login .title {
   color: #fff;
   font-size: 4em;
+}
+.login .subtitle {
   margin-bottom: 20px;
 }
 
