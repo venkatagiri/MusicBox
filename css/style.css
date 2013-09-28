@@ -22,6 +22,9 @@ a {
 a:hover {
   text-decoration: underline;
 }
+.ng-cloak {
+  display: none !important;
+}
 
 /* Header */
 header {
@@ -104,6 +107,27 @@ h3 {
   right: 0;
   padding: 20px;
   overflow: auto;
+}
+
+.login {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  padding-top: 60px;
+  background: #e62020;
+  text-align: center;
+  color: #fff;
+  z-index: 9999;
+}
+.login button {
+  color: #e62020;
+}
+.login .title {
+  color: #fff;
+  font-size: 4em;
+  margin-bottom: 20px;
 }
 
 /* The Player */

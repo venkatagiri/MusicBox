@@ -171,9 +171,8 @@ angular
           alert("Error opening default datastore: " + error);
           return;
         }
-        $rootScope.$apply(function() {
-          deferredDatastore.resolve(datastore);
-        });
+        deferredDatastore.resolve(datastore);
+        $rootScope.$apply();
     });
   });
 
@@ -201,10 +200,9 @@ angular
                   console.log(error);
                   return callback(error.description.replace(/\+/g, " "));
                 }
-                $rootScope.$apply(function() {
-                  deferredDatastore.resolve(datastore);
-                  store.set("loggedin", true);
-                });
+                deferredDatastore.resolve(datastore);
+                store.set("loggedin", true);
+                $rootScope.$apply();
                 callback();
             });
 
@@ -303,9 +301,8 @@ angular
         success: function(data) {
           settings.set("lastfm.name", data.session.name);
           settings.set("lastfm.key", data.session.key);
-          $rootScope.$apply(function() {
-            $route.reload();
-          });
+          $route.reload();
+          $rootScope.$apply();
         },
         error: function(code, message) {
           console.log(code, message);

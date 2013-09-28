@@ -9,56 +9,58 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body class="loading" data-ng-controller="MainCtrl">
-  <header>
-    <h1>DB Music</h1>
-    <div class="links" data-ng-show="dropbox.isLoggedIn()">
-      <span class="name">{{dropbox.getAccountName()}}</span>
-      <a href="#/settings">Settings</a>
-      <a href="#/logout">Logout</a>
-    </div>
-    <form class="pure-form search-form" data-ng-submit="search()">
-      <input class="pure-input-2-3" type="text" placeholder="Search music..." data-ng-model="query" data-ng-trim="false" />
-    </form>
-  </header>
-
-  <nav class="pure-menu pure-menu-open" id="nav">
-    <ul data-active-link="active">
-      <li><span class="pure-menu-heading">Library</span></li>
-      <li><a href="#/artists">Artists</a></li>
-      <li><a href="#/albums">Albums</a></li>
-      <li><a href="#/songs">Songs</a></li>
-      <li><a href="#/genres">Genres</a></li>
-      <li><a href="#/queue">Queue</a></li>
-    </ul>
-  </nav>
-
-  <div data-ng-view class="content">
-  </div>
-
-  <div class="player" data-ng-controller="PlayerCtrl">
-    <audio data-ng-src="{{src}}" autoplay></audio>
-
-    <div class="progress" style="width: {{progress}}%"></div>
-    <div class="controls">
-      <button data-ng-click="prev()" class="ctrl-btn ctrl-btn-prev"></button>
-      <button data-ng-click="play()" data-ng-show="!playing" class="ctrl-btn ctrl-btn-play"></button>
-      <button data-ng-click="pause()" data-ng-show="playing" class="ctrl-btn ctrl-btn-pause"></button>
-      <button data-ng-click="next()" class="ctrl-btn ctrl-btn-next"></button>
-    </div>
-    <div class="volume">
-      <button data-ng-click="changeVolume(-1)">-</button>
-      <span>{{volume}}</span>
-      <button data-ng-click="changeVolume(+1)">+</button>
-    </div>
-    <div class="current-song">
-      <div data-col="name" title="{{song.get('name')}}">
-        {{song.get("name")}}
-        <span data-ng-show="scrobbled" class="scrobbled" title="Scrobbled!">✓</span>
+  <div class="main ng-cloak">
+    <header data-ng-show="dropbox.isLoggedIn()">
+      <h1>DB Music</h1>
+      <div class="links">
+        <span class="name">{{dropbox.getAccountName()}}</span>
+        <a href="#/settings">Settings</a>
+        <a href="#/logout">Logout</a>
       </div>
-      <div data-col="artist" title="{{song.get('artist')}}">{{song.get("artist")}}</div>
+      <form class="pure-form search-form" data-ng-submit="search()">
+        <input class="pure-input-2-3" type="text" placeholder="Search music..." data-ng-model="query" data-ng-trim="false" />
+      </form>
+    </header>
+
+    <nav class="pure-menu pure-menu-open" id="nav" data-ng-show="dropbox.isLoggedIn()">
+      <ul data-active-link="active">
+        <li><span class="pure-menu-heading">Library</span></li>
+        <li><a href="#/artists">Artists</a></li>
+        <li><a href="#/albums">Albums</a></li>
+        <li><a href="#/songs">Songs</a></li>
+        <li><a href="#/genres">Genres</a></li>
+        <li><a href="#/queue">Queue</a></li>
+      </ul>
+    </nav>
+
+    <div data-ng-view class="content">
+    </div>
+
+    <div class="player" data-ng-controller="PlayerCtrl" data-ng-show="dropbox.isLoggedIn()">
+      <audio data-ng-src="{{src}}" autoplay></audio>
+
+      <div class="progress" style="width: {{progress}}%"></div>
+      <div class="controls">
+        <button data-ng-click="prev()" class="ctrl-btn ctrl-btn-prev"></button>
+        <button data-ng-click="play()" data-ng-show="!playing" class="ctrl-btn ctrl-btn-play"></button>
+        <button data-ng-click="pause()" data-ng-show="playing" class="ctrl-btn ctrl-btn-pause"></button>
+        <button data-ng-click="next()" class="ctrl-btn ctrl-btn-next"></button>
+      </div>
+      <div class="volume">
+        <button data-ng-click="changeVolume(-1)">-</button>
+        <span>{{volume}}</span>
+        <button data-ng-click="changeVolume(+1)">+</button>
+      </div>
+      <div class="current-song">
+        <div data-col="name" title="{{song.get('name')}}">
+          {{song.get("name")}}
+          <span data-ng-show="scrobbled" class="scrobbled" title="Scrobbled!">✓</span>
+        </div>
+        <div data-col="artist" title="{{song.get('artist')}}">{{song.get("artist")}}</div>
+      </div>
     </div>
   </div>
-  
+
   <script type="text/ng-template" id="songs/list">
     <h2 data-ng-show="!hideHeading">Songs</h2>
     <p data-ng-show="!songs.length">No Songs</p>
@@ -192,9 +194,12 @@
   </script>
 
   <script type="text/ng-template" id="login">
-    <button class="pure-button pure-button-primary" data-ng-click="login()">Login to Dropbox</button>
-    <p data-ng-show="loggingIn">Logging In...</p>
-    <p data-ng-show="error">Login Failed. Reason: {{error}}</p>
+    <div class="login">
+      <img src="img/logo.png" />
+      <div class="title">DB Music</div>
+      <button class="pure-button" data-ng-click="login()">Login to Dropbox</button>
+      <p data-ng-show="msg">{{msg}}</p>
+    </div>
   </script>
 
   <script type="text/ng-template" id="logout">

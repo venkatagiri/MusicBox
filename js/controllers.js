@@ -7,9 +7,11 @@ angular
     if(!dropbox.isLoggedIn()) {
       if (next.split("#")[1] !== "/login") {
         $location.path("/login");
+        $rootScope.$apply();
       }
     } else if(next.split("#")[1] === "/login") {
       $location.path("/songs");
+      $rootScope.$apply();
     }
   });
 }])
@@ -41,28 +43,25 @@ angular
 // Login
 .controller("LoginCtrl", ["$scope", "$location", "dropbox", function($scope, $location, dropbox) {
   $scope.login = function() {
-    $scope.loggingIn = true;
-    $scope.error = "";
+    $scope.msg = "Logging In...";
     dropbox.login(function(error) {
-      $scope.$apply(function() {
-        $scope.loggingIn = false;
-        if(error) {
-          console.log(error);
-          $scope.error = error;
-        } else {
-          $location.path("/songs");
-        }
-      });
+      if(error) {
+        console.log(error);
+        $scope.msg = "Login Failed. ("+error+")";
+      } else {
+        $scope.msg = "Login successful! Reticulating Splines now...";
+        $location.path("/songs");
+      }
+      $scope.$apply();
     });
   };
 }])
 
 // Logout
-.controller("LogoutCtrl", ["$location", "dropbox", function($location, dropbox) {
+.controller("LogoutCtrl", ["$scope", "$location", "dropbox", function($scope, $location, dropbox) {
   dropbox.logout(function() {
-    $scope.$apply(function() {
-      $location.path("/login");
-    });
+    $location.path("/login");
+    $scope.$apply();
   });
 }])
 
@@ -76,10 +75,9 @@ angular
     $scope.msg = "Scanning...";
     library.scanDropbox();
     $scope.$on("library.song.added", function() {
-      $scope.$apply(function() {
-        count++;
-        $scope.msg = count + " songs added.";
-      });
+      count++;
+      $scope.msg = count + " songs added.";
+      $scope.$apply();
     });
   };
   $scope.resetLibrary = function() {
