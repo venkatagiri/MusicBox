@@ -13,6 +13,9 @@ angular
     },
     remove: function(key) {
       localStorage.removeItem(key);
+    },
+    clear: function() {
+      localStorage.clear();
     }
   };
 })
@@ -226,8 +229,7 @@ angular
           return callback(error);
         }
         client.signOut();
-        store.remove("loggedin");
-        store.remove("account");
+        store.clear();
         callback();
       });
     },
