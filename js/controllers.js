@@ -15,7 +15,7 @@ angular
   });
 }])
 
-.controller("MainCtrl", ["$scope", "$location", "$route", "dropbox", function($scope, $location, $route, dropbox) {
+.controller("MainCtrl", ["$scope", "$location", "dropbox", function($scope, $location, dropbox) {
   if(dropbox.isLoggedIn()) {
     $scope.$on("datastore.loaded",  function() {
       document.body.classList.remove("loading");
