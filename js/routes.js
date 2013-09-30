@@ -21,5 +21,5 @@ angular
   .when("/genre/:genre", { templateUrl: "genres/show", controller: "GenresShowCtrl", resolve: resolveLibrary })
   .when("/queue", { templateUrl: "queue", controller: "QueueCtrl", resolve: resolveLibrary })
   .when("/search/:query", { templateUrl: "search", controller: "SearchCtrl", resolve: resolveLibrary })
-  .otherwise({redirectTo: "/login"});
+  .otherwise({redirectTo: "/queue"});
 }]);
