@@ -39,7 +39,7 @@
     <div class="player" data-ng-controller="PlayerCtrl" data-ng-show="dropbox.isLoggedIn()">
       <audio data-ng-src="{{src}}" autoplay></audio>
 
-      <div class="progress" style="width: {{progress}}%"></div>
+      <div class="progress" data-ng-style="{width: progress+'%'}"></div>
       <div class="controls">
         <button data-ng-click="prev()" class="ctrl-btn ctrl-btn-prev"></button>
         <button data-ng-click="play()" data-ng-show="!playing" class="ctrl-btn ctrl-btn-play"></button>
@@ -152,7 +152,7 @@
   </script>
 
   <script type="text/ng-template" id="queue">
-    <h2>Queue</h2>
+    <h2>Queue <button class="clear-queue" title="Clear Queue" data-ng-click="clearQueue()"></button></h2>
     <p data-ng-show="!songs.length">The queue is currently empty</p>
     <table class="pure-table pure-table-horizontal songs-list" data-ng-show="songs.length">
       <thead>

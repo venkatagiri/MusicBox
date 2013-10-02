@@ -133,8 +133,19 @@ angular
     $scope.audio.volume = $scope.volume * 0.1;
     store.set("volume", $scope.volume);
   };
+
+  function updateProgressBar() {
+    $scope.progress = ($scope.audio.currentTime/$scope.audio.duration) * 100;
+
+    // Scrobble to Last.fm if song has been played for at least half its duration, or for 4 minutes.
+    if(lastfm.isLoggedIn() && $scope.playing && !$scope.scrobbled && ($scope.progress > 50 || $scope.audio.currentTime > 240)) {
+      $scope.scrobbled = true;
+      lastfm.scrobble($scope.song);
+    }
+    if($scope.playing) $timeout(updateProgressBar, 100);
+  }
   
-  $scope.$on("song.change",  function() {
+  $scope.$on("queue.song.change",  function() {
     var song = queue.currentSong();
     console.log("Current Song:", song.get("name"));
     
@@ -156,19 +167,17 @@ angular
       $scope.play();
     }
   });
-
-  function updateProgressBar() {
-    $scope.progress = ($scope.audio.currentTime/$scope.audio.duration) * 100;
-
-    // Scrobble to Last.fm if song has been played for at least half its duration, or for 4 minutes.
-    if(lastfm.isLoggedIn() && $scope.playing && !$scope.scrobbled && ($scope.progress > 50 || $scope.audio.currentTime > 240)) {
-      $scope.scrobbled = true;
-      lastfm.scrobble($scope.song);
-    }
-    if($scope.playing) $timeout(updateProgressBar, 100);
-  };
+  $scope.$on("queue.end", function() {
+    $scope.pause();
+    $scope.src = "";
+    $scope.scrobbled = false;
+    $scope.progress = 0;
+    $scope.song = undefined;
+  });
   
-  $scope.audio.addEventListener("ended", function() { $scope.next(); }, false);
+  $scope.audio.addEventListener("ended", function() {
+    $scope.next();
+  }, false);
   document.addEventListener("keypress", function(e) {
     if(e.keyCode == 32) {
       if($scope.audio.paused) $scope.play();
@@ -217,9 +226,14 @@ angular
   $scope.play = function() {
     queue.play(this.$index);
   };
-  $scope.$on("song.change", function() {
+  $scope.$on("queue.song.change", function() {
     $scope.nowPlaying = queue.index();
   });
+  $scope.clearQueue = function() {
+    $scope.songs = [];
+    $scope.nowPlaying = -1;
+    queue.clear();
+  };
 }])
 
 //Albums

@@ -257,6 +257,17 @@ h3 {
   display: none;
 }
 
+/* Queue */
+.clear-queue {
+  width: 20px;
+  height: 20px;
+  background: url(../img/clear-queue.png) no-repeat;
+  border: 0;
+  vertical-align: middle;
+  margin-left: 5px;
+  outline: none;
+}
+
 /* Cards List */
 .cards {
   list-style-type: none;

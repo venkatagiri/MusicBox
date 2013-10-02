@@ -371,43 +371,57 @@ angular
 }])
 
 // Queue Service
-.service("queue", ["$rootScope", function($rootScope) {
-  var _songs = [],
-    _index = -1;
+.service("queue", ["$rootScope", "dropbox", "library", function($rootScope, dropbox, library) {
+  var songs,
+    queue,
+    current = -1;
+
+  dropbox.datastoreLoaded.then(function(ds) {
+    queue = ds.getTable("queue");
+    songs = queue.query();
+  });
 
   return {
-    add: function(songs, index) {
-      console.log("Adding", songs.length, "song(s) to the queue!");
-      _songs = _songs.concat(songs);
-      if(index > -1) this.play(index);
-      else if(_songs.length == songs.length) this.play(0);
+    add: function(_songs, _index) {
+      console.log("Adding", _songs.length, "song(s) to the queue!");
+      songs = songs.concat(_songs);
+      for(var i=0,len=_songs.length; i < len; i++) {
+        queue.insert(_songs[i].getFields());
+      }
+      if(_index > -1) this.play(_index);
+      else if(songs.length == _songs.length) this.play(0);
     },
     songs: function() {
-      return _songs;
+      return songs;
     },
     index: function() {
-      return _index;
+      return current;
     },
     clear: function() {
-      _songs.length = 0;
-      _index = -1;
+      var records = queue.query();
+      for(var i=0,len=records.length; i < len; i++) {
+        records[i].deleteRecord();
+      }
+      songs.length = 0;
+      current = -1;
+      $rootScope.$broadcast("queue.end");
     },
     play: function(index) {
-      _index = index;
-      $rootScope.$broadcast("song.change");
+      current = index;
+      $rootScope.$broadcast("queue.song.change");
     },
     currentSong: function() {
-      return _songs[_index];
+      return songs[current];
     },
     nextSong: function() {
-      if(_index + 1 === _songs.length) return;
-      _index++;
-      $rootScope.$broadcast("song.change");
+      if(current + 1 === songs.length) return $rootScope.$broadcast("queue.end");
+      current++;
+      $rootScope.$broadcast("queue.song.change");
     },
     previousSong: function() {
-      if(_index === 0) return false;
-      _index--;
-      $rootScope.$broadcast("song.change");
+      if(current === 0) return false;
+      current--;
+      $rootScope.$broadcast("queue.song.change");
     }
   };
 }]);
