@@ -15,10 +15,11 @@ angular
   });
 }])
 
-.controller("MainCtrl", ["$scope", "$location", "dropbox", function($scope, $location, dropbox) {
+.controller("MainCtrl", ["$scope", "$location", "dropbox", "library", function($scope, $location, dropbox, library) {
   if(dropbox.isLoggedIn()) {
     $scope.$on("datastore.loaded",  function() {
       document.body.classList.remove("loading");
+      library.scanDropbox();
     });
   } else {
     document.body.classList.remove("loading");
@@ -30,7 +31,12 @@ angular
   $scope.search = function() {
     $location.path("/search/"+$scope.query);
   };
-  $scope.$on('$routeChangeSuccess', function(e, current, previous) {
+
+  $scope.$on("library.scan.msg", function(e, msg) {
+    $scope.scanMessage = msg;
+    if(!$scope.$$phase) $scope.$apply();
+  });
+  $scope.$on("$routeChangeSuccess", function(e, current, previous) {
     if(current.loadedTemplateUrl === "search") {
       $scope.query = current.params.query;
     } else {
@@ -40,7 +46,7 @@ angular
 }])
 
 // Login
-.controller("LoginCtrl", ["$scope", "$location", "dropbox", function($scope, $location, dropbox) {
+.controller("LoginCtrl", ["$scope", "$location", "dropbox", "library", function($scope, $location, dropbox, library) {
   $scope.login = function() {
     $scope.msg = "Logging In...";
     dropbox.login(function(error) {
@@ -49,7 +55,8 @@ angular
         $scope.msg = "Login Failed. ("+error+")";
       } else {
         $scope.msg = "Login successful! Reticulating Splines now...";
-        $location.path("/songs");
+        $location.path("/queue");
+        library.scanDropbox();
       }
       $scope.$apply();
     });
@@ -70,14 +77,7 @@ angular
   $scope.lastfmName = lastfm.getName();
   
   $scope.scanDropbox = function() {
-    var count = 0;
-    $scope.msg = "Scanning...";
     library.scanDropbox();
-    $scope.$on("library.song.added", function() {
-      count++;
-      $scope.msg = count + " songs added.";
-      $scope.$apply();
-    });
   };
   $scope.resetLibrary = function() {
     $scope.reset_msg = "Resetting...";
@@ -85,7 +85,7 @@ angular
       if(error) {
         $scope.reset_msg = msg;
       } else {
-        $scope.reset_msg = "Reset Complete! Refreshing now...";
+        $scope.reset_msg = "Reset Complete! Scan will continue after reloading the page...";
         location.reload();
       }
     });

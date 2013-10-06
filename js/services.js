@@ -23,9 +23,10 @@ angular
 // Library Service to build and manage the Music Library
 .service("library", ["$rootScope", "$q", "lastfm", "dropbox", function($rootScope, $q, lastfm, dropbox) {
   var datastore = false,
-    songs, albums, artists, genres;
+    songs, albums, artists, genres,
+    isScanning = false;
   
-  function addSong(file, url) {
+  function addSong(file, url, callback) {
     var song = songs.query({path: file.path})[0];
 
     // Song already exists. Delete older entries before song is added again.
@@ -89,7 +90,7 @@ angular
           name: tags.genre
         });
       }
-      $rootScope.$broadcast("library.song.added");
+      callback();
     }, { tags: ["artist", "title", "album", "genre"] });
   }
 
@@ -131,26 +132,48 @@ angular
       return genres.query(params);
     },
     scanDropbox: function() {
+      if(isScanning) return;
+
+      isScanning = true;
+      $rootScope.$broadcast("library.scan.msg", "Searching...");
+
       dropbox.search("/", "mp3", {limit: 999}, function(error, files) {
+        console.log("Found", files.length, "song(s)");
+
         if(error) {
           console.log(error);
+          $rootScope.$broadcast("library.scan.msg", "Error occured! Try again later.");
           return;
         }
-        
-        console.log("Found", files.length, "songs");
-        for(var i=0, len=files.length; i < len; i++) {
-          (function(file) {
-            var song = songs.query({path: file.path})[0];
-            if(song && song.get("version") === file.versionTag) return; // If song version has not changed, don't index it again.
 
-            dropbox.getUrl(file.path, function(error, details) {
-              if(error) {
-                console.log(error);
-                return;
+        var changed = 0,
+          added = 0;
+
+        $rootScope.$broadcast("library.scan.msg", "Scanning...");
+        angular.forEach(files, function(file) {
+          var song = songs.query({path: file.path})[0];
+          if(song && song.get("version") === file.versionTag) return; // If song version has not changed, don't index it again.
+
+          changed++;
+          dropbox.getUrl(file.path, function(error, details) {
+            if(error) {
+              console.log(error);
+              return;
+            }
+            addSong(file, details.url, function() {
+              added++;
+              $rootScope.$broadcast("library.scan.msg", added+" song(s) added/updated!");
+              if(changed === added) { // We have indexed all the modified songs.
+                $rootScope.$broadcast("library.scan.msg", "Scan Complete! "+added+" song(s) added/updated!");
+                isScanning = false;
               }
-              addSong(file, details.url);
             });
-          })(files[i]);
+          });
+        });
+
+        if(changed === 0) {
+          $rootScope.$broadcast("library.scan.msg", "Scan Complete! Everything up-to date!");
+          isScanning = false;
         }
       });
     }
@@ -385,9 +408,9 @@ angular
     add: function(_songs, _index) {
       console.log("Adding", _songs.length, "song(s) to the queue!");
       songs = songs.concat(_songs);
-      for(var i=0,len=_songs.length; i < len; i++) {
-        queue.insert(_songs[i].getFields());
-      }
+      angular.forEach(_songs, function(song) {
+        queue.insert(song.getFields());
+      });
       if(_index > -1) this.play(_index);
       else if(songs.length == _songs.length) this.play(0);
     },
@@ -398,10 +421,9 @@ angular
       return current;
     },
     clear: function() {
-      var records = queue.query();
-      for(var i=0,len=records.length; i < len; i++) {
-        records[i].deleteRecord();
-      }
+      angular.forEach(queue.query(), function(record) {
+        record.deleteRecord();
+      });
       songs.length = 0;
       current = -1;
       $rootScope.$broadcast("queue.end");

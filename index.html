@@ -11,14 +11,15 @@
   <div class="main ng-cloak">
     <header data-ng-show="dropbox.isLoggedIn()">
       <h1>DB Music</h1>
+      <form class="pure-form search-form" data-ng-submit="search()">
+        <input class="search-box" type="text" placeholder="Search music..." data-ng-model="query" data-ng-trim="false" />
+      </form>
+      <div class="scan-msg">{{scanMessage}}</div>
       <div class="links">
         <span class="name">{{dropbox.getAccountName()}}</span>
         <a href="#/settings">Settings</a>
         <a href="#/logout">Logout</a>
       </div>
-      <form class="pure-form search-form" data-ng-submit="search()">
-        <input class="pure-input-2-3" type="text" placeholder="Search music..." data-ng-model="query" data-ng-trim="false" />
-      </form>
     </header>
 
     <nav class="pure-menu pure-menu-open" id="nav" data-ng-show="dropbox.isLoggedIn()">
@@ -210,14 +211,14 @@
     <h2>Settings</h2>
 
     <h3>Music Library</h3>
-    <p>Number of songs in your Dropbox: <strong>{{songsCount}}</strong></p>
+    <p>Songs in your Dropbox: <strong>{{songsCount}}</strong></p>
     <p>
       <button class="pure-button pure-button-primary" data-ng-click="scanDropbox()">Scan Dropbox</button>
       <span>{{msg || "Finds all audio files in your Dropbox and builds the Music Library."}}</span>
     </p>
     <p>
       <button class="pure-button pure-button-primary" data-ng-click="resetLibrary()">Reset Music Library</button>
-      <span>{{reset_msg || "Resets the Music Library(Your audio files will not be deleted)."}}</span>
+      <span>{{reset_msg || "Resets the Music Library and scans again! Your files will not be deleted."}}</span>
     </p>
 
     <h3>Last.fm</h3>

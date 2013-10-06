@@ -60,11 +60,16 @@ h3 {
 }
 
 .search-form {
-  padding: 10px 0 0 220px;
+  float: left;
+  margin: 10px 0 0 20px;
 }
-.search-form input {
-  max-width: 400px;
+.search-form .search-box {
+  width: 300px;
   border-radius: 0 !important;
+}
+.scan-msg {
+  float: left;
+  margin: 15px 0 0 20px;
 }
 
 .links {
