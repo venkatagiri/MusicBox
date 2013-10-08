@@ -104,8 +104,6 @@ angular
   $scope.playing = false;
   $scope.scrobbled = false;
   
-  var urlCache = [];
-  
   $scope.play = function() {
     if($scope.src === "") {
       queue.nextSong();
@@ -147,25 +145,20 @@ angular
   
   $scope.$on("queue.song.change",  function() {
     var song = queue.currentSong();
-    console.log("Current Song:", song.get("name"));
     
+    console.log("Current Song:", song.get("name"));
     $scope.pause();
     $scope.song = song;
     $scope.src = "";
     $scope.scrobbled = false;
     
-    if(!urlCache[song.get('path')]) {
-      dropbox.getUrl(song.get('path'), function(error, details) {
-        if(error) return console.log(error);
-        
-        $scope.src = urlCache[song.get('path')] = details.url;
-        $scope.play();
-        if(lastfm.isLoggedIn()) lastfm.nowPlaying($scope.song);
-      });
-    } else {
-      $scope.src = urlCache[song.get('path')];
+    dropbox.getUrl(song.get('path'), function(error, details) {
+      if(error) return console.log(error);
+      
+      $scope.src = details.url;
       $scope.play();
-    }
+      if(lastfm.isLoggedIn()) lastfm.nowPlaying($scope.song);
+    });
   });
   $scope.$on("queue.end", function() {
     $scope.pause();
