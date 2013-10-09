@@ -23,7 +23,7 @@ angular
 // Library Service to build and manage the Music Library
 .service("library", ["$rootScope", "$q", "lastfm", "dropbox", function($rootScope, $q, lastfm, dropbox) {
   var datastore = false,
-    songs, albums, artists, genres,
+    songs, albums, artists, genres, playlists,
     isScanning = false;
   
   function addSong(file, url, callback) {
@@ -100,6 +100,7 @@ angular
     artists = datastore.getTable("artists");
     albums = datastore.getTable("albums");
     genres = datastore.getTable("genres");
+    playlists = datastore.getTable("playlists");
     $rootScope.$broadcast("datastore.loaded");
     deferred.resolve();
   });
@@ -130,6 +131,44 @@ angular
     },
     getGenres: function(params) {
       return genres.query(params);
+    },
+    getPlaylists: function() {
+      return playlists.query();
+    },
+    getPlaylist: function(name) {
+      var playlist =  playlists.query({name: name})[0],
+        playlistSongs = [],
+        songIds;
+
+      if(playlist) {
+        songIds = playlist.getOrCreateList("songIds").toArray();
+        angular.forEach(songIds, function(songId) {
+          playlistSongs.push(songs.get(songId));
+        });
+      }
+
+      return playlistSongs;
+    },
+    clearPlaylist: function(name) {
+      var playlist =  playlists.query({name: name})[0];
+      if(playlist) playlist.set("songIds", []);
+    },
+    addToPlaylist: function(name, songs) {
+      var playlist = playlists.query({name: name})[0] || playlists.insert({name: name}),
+        songIds = playlist.getOrCreateList("songIds");
+      
+      angular.forEach(songs, function(song) {
+        songIds.push(song.getId());
+      });
+    },
+    getQueue: function() {
+      return this.getPlaylist("Queue");
+    },
+    addToQueue: function(songs) {
+      this.addToPlaylist("Queue", songs);
+    },
+    clearQueue: function() {
+      this.clearPlaylist("Queue");
     },
     scanDropbox: function() {
       if(isScanning) return;
@@ -396,21 +435,17 @@ angular
 // Queue Service
 .service("queue", ["$rootScope", "dropbox", "library", function($rootScope, dropbox, library) {
   var songs,
-    queue,
     current = -1;
 
   dropbox.datastoreLoaded.then(function(ds) {
-    queue = ds.getTable("queue");
-    songs = queue.query();
+    songs = library.getQueue();
   });
 
   return {
     add: function(_songs, _index) {
       console.log("Adding", _songs.length, "song(s) to the queue!");
       songs = songs.concat(_songs);
-      angular.forEach(_songs, function(song) {
-        queue.insert(song.getFields());
-      });
+      library.addToQueue(_songs);
       if(_index > -1) this.play(_index);
       else if(songs.length == _songs.length) this.play(0);
     },
@@ -421,9 +456,7 @@ angular
       return current;
     },
     clear: function() {
-      angular.forEach(queue.query(), function(record) {
-        record.deleteRecord();
-      });
+      library.clearQueue();
       songs.length = 0;
       current = -1;
       $rootScope.$broadcast("queue.end");
