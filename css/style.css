@@ -215,7 +215,25 @@ h3 {
 }
 .volume {
   float: left;
-  padding: 15px;
+  width: 75px;
+  padding: 22px 10px;
+}
+.volume .icon {
+  float: left;
+  margin-right: 5px;
+}
+.volume .bar {
+  float: left;
+  width: 3px;
+  height: 12px;
+  border-right: 1px solid white;
+  border-left: 1px solid white;
+  background: #bbb;
+  cursor: pointer;
+  margin-top: 2px;
+}
+.volume .bar.active {
+  background: #000;
 }
 
 /* Songs List */

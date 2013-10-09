@@ -47,9 +47,11 @@
         <button data-ng-click="next()" class="ctrl-btn ctrl-btn-next"></button>
       </div>
       <div class="volume">
-        <button data-ng-click="changeVolume(-1)">-</button>
-        <span>{{volume}}</span>
-        <button data-ng-click="changeVolume(+1)">+</button>
+        <img src="img/volume.png" class="icon"/>
+        <div data-ng-repeat="n in [] | range:10"
+          data-value="{{$index+1}}"
+          data-ng-attr-class="{{$index+1 <= volume && 'bar active' || 'bar'}}">
+        </div>
       </div>
       <div class="current-song">
         <div data-col="name" title="{{song.get('name')}}">

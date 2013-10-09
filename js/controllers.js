@@ -125,12 +125,6 @@ angular
     $scope.pause();
     queue.previousSong();
   };
-  $scope.changeVolume = function(delta) {
-    if($scope.volume + delta < 0 || $scope.volume + delta > 10) return;
-    $scope.volume += delta;
-    $scope.audio.volume = $scope.volume * 0.1;
-    store.set("volume", $scope.volume);
-  };
 
   function updateProgressBar() {
     $scope.progress = ($scope.audio.currentTime/$scope.audio.duration) * 100;
@@ -181,6 +175,12 @@ angular
       queue.nextSong();
     }
   }, false);
+  document.querySelector(".volume").addEventListener("click", function(e) {
+    $scope.volume = e.target.dataset.value;
+    $scope.audio.volume = $scope.volume * 0.1;
+    store.set("volume", $scope.volume);
+    if(!$scope.$$phase) $scope.$apply();
+  });
 }])
 
 // Search
