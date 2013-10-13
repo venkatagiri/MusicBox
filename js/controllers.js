@@ -1,13 +1,43 @@
 angular
 .module("controllers", [])
 
+// Scope.SafeApply (https://github.com/yearofmoo/AngularJS-Scope.SafeApply)
+.run(function($rootScope) {
+  $rootScope.$safeApply = function() {
+    var $scope, fn, force = false;
+    if(arguments.length == 1) {
+      var arg = arguments[0];
+      if(typeof arg == 'function') {
+        fn = arg;
+      } else {
+        $scope = arg;
+      }
+    }
+    else {
+      $scope = arguments[0];
+      fn = arguments[1];
+      if(arguments.length == 3) {
+        force = !!arguments[2];
+      }
+    }
+    $scope = $scope || this;
+    fn = fn || function() { };
+    if(force || !$scope.$$phase) {
+      if($scope.$apply) $scope.$apply(fn);
+      else $scope.apply(fn);
+    } else {
+      fn();
+    }
+  };
+})
+
 // Authentication Check
 .run(["$rootScope", "$location", "dropbox", function($rootScope, $location, dropbox) {
   $rootScope.$on("$locationChangeStart", function(event, next, current) {
     if(!dropbox.isLoggedIn()) {
       if (next.split("#")[1] !== "/login") {
         $location.path("/login");
-        $rootScope.$apply();
+        $rootScope.$safeApply();
       }
     } else if(next.split("#")[1] === "/login") {
       event.preventDefault(); // Do not allow navigation to login if already logged in.
@@ -34,7 +64,7 @@ angular
 
   $scope.$on("library.scan.msg", function(e, msg) {
     $scope.scanMessage = msg;
-    if(!$scope.$$phase) $scope.$apply();
+    $scope.$safeApply();
   });
   $scope.$on("$routeChangeSuccess", function(e, current, previous) {
     if(current.loadedTemplateUrl === "search") {
@@ -58,7 +88,7 @@ angular
         $location.path("/queue");
         library.scanDropbox();
       }
-      $scope.$apply();
+      $scope.$safeApply();
     });
   };
 }])
@@ -67,7 +97,7 @@ angular
 .controller("LogoutCtrl", ["$scope", "$location", "dropbox", function($scope, $location, dropbox) {
   dropbox.logout(function() {
     $location.path("/login");
-    $scope.$apply();
+    $scope.$safeApply();
   });
 }])
 
@@ -110,12 +140,13 @@ angular
     } else {
       $scope.audio.play();
       $scope.playing = true;
-      updateProgressBar();
+      $scope.$safeApply();
     }
   };
   $scope.pause = function() {
     $scope.audio.pause();
     $scope.playing = false;
+    $scope.$safeApply();
   };
   $scope.next = function() {
     $scope.pause();
@@ -125,17 +156,6 @@ angular
     $scope.pause();
     queue.previousSong();
   };
-
-  function updateProgressBar() {
-    $scope.progress = ($scope.audio.currentTime/$scope.audio.duration) * 100;
-
-    // Scrobble to Last.fm if song has been played for at least half its duration, or for 4 minutes.
-    if(lastfm.isLoggedIn() && $scope.playing && !$scope.scrobbled && ($scope.progress > 50 || $scope.audio.currentTime > 240)) {
-      $scope.scrobbled = true;
-      lastfm.scrobble($scope.song);
-    }
-    if($scope.playing) $timeout(updateProgressBar, 100);
-  }
   
   $scope.$on("queue.song.change",  function() {
     var song = queue.currentSong();
@@ -150,6 +170,7 @@ angular
       if(error) return console.log(error);
       
       $scope.src = details.url;
+      $scope.$safeApply();
       $scope.play();
       if(lastfm.isLoggedIn()) lastfm.nowPlaying($scope.song);
     });
@@ -163,8 +184,19 @@ angular
   });
   
   $scope.audio.addEventListener("ended", function() {
-    $scope.next();
+    $scope.next(); // When audio ends, play next song in Queue.
   }, false);
+  $scope.audio.addEventListener("timeupdate", function() {
+    $scope.progress = ($scope.audio.currentTime/$scope.audio.duration) * 100;
+
+    // Scrobble to Last.fm if song has been played for at least half its duration, or for 4 minutes.
+    if(lastfm.isLoggedIn() && $scope.playing && !$scope.scrobbled && ($scope.progress > 50 || $scope.audio.currentTime > 240)) {
+      $scope.scrobbled = true;
+      lastfm.scrobble($scope.song);
+    }
+    $scope.$safeApply();
+  }, false);
+
   document.addEventListener("keypress", function(e) {
     if(e.keyCode == 32) {
       if($scope.audio.paused) $scope.play();
@@ -179,7 +211,7 @@ angular
     $scope.volume = e.target.dataset.value;
     $scope.audio.volume = $scope.volume * 0.1;
     store.set("volume", $scope.volume);
-    if(!$scope.$$phase) $scope.$apply();
+    $scope.$safeApply();
   });
 }])
 
@@ -281,4 +313,3 @@ angular
     queue.add([song]);
   };
 }]);
-

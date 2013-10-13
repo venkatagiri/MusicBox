@@ -237,7 +237,7 @@ angular
           return;
         }
         deferredDatastore.resolve(datastore);
-        $rootScope.$apply();
+        $rootScope.$safeApply();
     });
   });
 
@@ -267,7 +267,7 @@ angular
                 }
                 deferredDatastore.resolve(datastore);
                 store.set("loggedin", true);
-                $rootScope.$apply();
+                $rootScope.$safeApply();
                 callback();
             });
 
@@ -366,7 +366,7 @@ angular
           settings.set("lastfm.name", data.session.name);
           settings.set("lastfm.key", data.session.key);
           $route.reload();
-          $rootScope.$apply();
+          $rootScope.$safeApply();
         },
         error: function(code, message) {
           console.log(code, message);
