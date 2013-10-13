@@ -493,9 +493,8 @@ angular
   
   $rootScope.$on('$routeChangeSuccess', function() {
     $window.ga('send', 'pageview', {
-      location:  $location.absUrl(),
-      page : $location.url
+      location: $location.absUrl(),
+      page: $location.url
     });
   });
-  
 }]);
