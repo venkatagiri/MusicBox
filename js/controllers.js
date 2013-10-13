@@ -128,6 +128,8 @@ angular
 // Audio Player
 .controller("PlayerCtrl", ["$scope", "$timeout", "queue", "dropbox", "store", "lastfm", function($scope, $timeout, queue, dropbox, store, lastfm) {
   $scope.audio = document.querySelector("audio");
+  $scope.seekbar = document.querySelector(".seek");
+  $scope.seekbar.value = 0;
   $scope.volume = store.get("volume") || 4;
   $scope.audio.volume = $scope.volume * 0.1;
   $scope.src = "";
@@ -183,10 +185,15 @@ angular
     $scope.song = undefined;
   });
   
+  $scope.audio.addEventListener("canplay", function() {
+    $scope.seekbar.min = 0;
+    $scope.seekbar.max = $scope.audio.duration;
+  }, false);
   $scope.audio.addEventListener("ended", function() {
     $scope.next(); // When audio ends, play next song in Queue.
   }, false);
   $scope.audio.addEventListener("timeupdate", function() {
+    $scope.seekbar.value = $scope.audio.currentTime;
     $scope.progress = ($scope.audio.currentTime/$scope.audio.duration) * 100;
 
     // Scrobble to Last.fm if song has been played for at least half its duration, or for 4 minutes.
@@ -196,6 +203,9 @@ angular
     }
     $scope.$safeApply();
   }, false);
+  $scope.seekbar.addEventListener("change", function() {
+    $scope.audio.currentTime = $scope.seekbar.value;
+  });
 
   document.addEventListener("keypress", function(e) {
     if(e.keyCode == 32) {
