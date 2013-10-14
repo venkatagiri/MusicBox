@@ -188,6 +188,22 @@ angular
     clearQueue: function() {
       this.clearPlaylist("Queue");
     },
+    createMixtape: function(artistName) {
+      var mixSongs = [],
+        defer = $q.defer();
+
+      lastfm.getSimilarArtists(artistName, function(error, similarArtists) {
+        angular.forEach(similarArtists, function(artist) {
+          if(mixSongs.length < 25 && artists.query({name: artist.name}).length > 0) {
+            mixSongs = mixSongs.concat(songs.query({artist: artist.name}));
+          }
+        });
+        defer.resolve(mixSongs);
+        $rootScope.$safeApply();
+      });
+
+      return defer.promise;
+    },
     scanDropbox: function() {
       if(isScanning) return;
 
@@ -408,6 +424,16 @@ angular
       lastfm.album.getInfo({artist: artist, album: album}, {
         success: function(data) {
           callback(null, data.album.image[2]["#text"]);
+        },
+        error: function(code, message) {
+          callback(message);
+        }
+      });
+    },
+    getSimilarArtists: function(artist, callback) {
+      lastfm.artist.getSimilar({artist: artist}, {
+        success: function(data) {
+          callback(null, data.similarartists.artist);
         },
         error: function(code, message) {
           callback(message);

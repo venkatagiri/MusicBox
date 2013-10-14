@@ -17,6 +17,7 @@ angular
   .when("/artist/:artist/album/:album", { templateUrl: "albums/show", controller: "AlbumsShowCtrl", resolve: resolveLibrary })
   .when("/artists", { templateUrl: "artists/list", controller: "ArtistsListCtrl", resolve: resolveLibrary })
   .when("/artist/:artist", { templateUrl: "artists/show", controller: "ArtistsShowCtrl", resolve: resolveLibrary })
+  .when("/artist/:artist/mixtape", { templateUrl: "artists/mixtape", controller: "ArtistsMixtapeCtrl", resolve: resolveLibrary })
   .when("/genres", { templateUrl: "genres/list", controller: "GenresListCtrl", resolve: resolveLibrary })
   .when("/genre/:genre", { templateUrl: "genres/show", controller: "GenresShowCtrl", resolve: resolveLibrary })
   .when("/queue", { templateUrl: "queue", controller: "QueueCtrl", resolve: resolveLibrary })

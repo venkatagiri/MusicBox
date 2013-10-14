@@ -305,6 +305,23 @@ angular
     queue.add([song]);
   };
 }])
+.controller("ArtistsMixtapeCtrl", ["$scope", "$routeParams", "library", "queue", function($scope, $routeParams, library, queue) {
+  $scope.artist = library.getArtists({name: $routeParams.artist})[0];
+  $scope.songs = library.createMixtape($routeParams.artist);
+  $scope.songs.then(function() {
+    $scope.loaded = true;
+    $scope.$safeApply();
+  });
+
+  $scope.play = function() {
+    queue.clear();
+    queue.add(this.filteredSongs, this.$index);
+  };
+  $scope.addToQueue = function(song) {
+    queue.add([song]);
+  };
+}])
+
 
 // Genres
 .controller("GenresListCtrl", ["$scope", "library", function($scope, library) {

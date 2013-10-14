@@ -127,11 +127,17 @@
   </script>
 
   <script type="text/ng-template" id="artists/show">
-    <h2>{{artist.get("name")}}</h2>
+    <h2>{{artist.get("name")}} <a href="#/artist/{{artist.get('name')}}/mixtape" class="action">♫ Create a Mixtape</a></h2>
     <h3>Albums</h3>
     <div data-ng-include="'albums/list'" data-ng-init="hideHeading=true"></div>
     <h3>Songs</h3>
     <div data-ng-include="'songs/list'" data-ng-init="hideHeading=true"></div>
+  </script>
+
+  <script type="text/ng-template" id="artists/mixtape">
+    <h2>Mixtape for {{artist.get("name")}}</h2>
+    <p data-ng-show="!loaded">Loading...</p>
+    <div data-ng-show="loaded" data-ng-include="'songs/list'" data-ng-init="hideHeading=true"></div>
   </script>
 
   <script type="text/ng-template" id="genres/list">

@@ -361,3 +361,11 @@ h3 {
   float: left;
   margin: 0 20px 20px 0;
 }
+
+/* Page Actions */
+.action {
+  color: #e62020;
+  font-size: 50%;
+  vertical-align: middle;
+  margin-left: 0.5em;
+}
