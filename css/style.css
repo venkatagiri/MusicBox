@@ -315,17 +315,6 @@ h3 {
   display: none;
 }
 
-/* Queue */
-.clear-queue {
-  width: 20px;
-  height: 20px;
-  background: url(../img/clear-queue.png) no-repeat;
-  border: 0;
-  vertical-align: middle;
-  margin-left: 5px;
-  outline: none;
-}
-
 /* Cards List */
 .cards {
   list-style-type: none;
@@ -368,4 +357,8 @@ h3 {
   font-size: 50%;
   vertical-align: middle;
   margin-left: 0.5em;
+  cursor: pointer;
+}
+.action:hover {
+  text-decoration: none;
 }
