@@ -162,7 +162,7 @@
   </script>
 
   <script type="text/ng-template" id="queue">
-    <h2>Queue <a class="action" data-ng-click="clearQueue()">× Clear Queue</a></h2>
+    <h2>Queue <a class="action" data-ng-click="clearQueue()" data-ng-show="songs.length">× Clear Queue</a></h2>
     <p data-ng-show="!songs.length">The queue is currently empty</p>
     <table class="pure-table pure-table-horizontal songs-list" data-ng-show="songs.length">
       <thead>
