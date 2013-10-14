@@ -286,6 +286,9 @@ angular
   $scope.addToQueue = function(song) {
     queue.add([song]);
   };
+  $scope.addAlbumToQueue = function() {
+    queue.add($scope.songs);
+  };
 }])
 
 // Artists
