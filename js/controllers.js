@@ -39,6 +39,9 @@ angular
         $location.path("/login");
         $rootScope.$safeApply();
       }
+    } else if(current.split("#")[1] === "/login") {
+      $location.path("/queue");
+      $rootScope.$safeApply();
     } else if(next.split("#")[1] === "/login") {
       event.preventDefault(); // Do not allow navigation to login if already logged in.
     }
