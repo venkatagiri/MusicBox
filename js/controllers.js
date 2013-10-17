@@ -221,6 +221,7 @@ angular
     }
   }, false);
   document.querySelector(".volume").addEventListener("click", function(e) {
+    if(!e.target.classList.contains("bar")) return;
     $scope.volume = e.target.dataset.value;
     $scope.audio.volume = $scope.volume * 0.1;
     store.set("volume", $scope.volume);
