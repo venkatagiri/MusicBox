@@ -329,10 +329,18 @@ angular
   };
 }])
 
-
 // Genres
 .controller("GenresListCtrl", ["$scope", "library", function($scope, library) {
   $scope.genres = library.getAllGenres();
+  $scope.albums = [];
+  angular.forEach($scope.genres, function(genre) {
+    angular.forEach(library.getAlbums({genre: genre.get("name")}), function(album) {
+      if(!$scope.albums[genre.get("name")]) $scope.albums[genre.get("name")] = [];
+      if($scope.albums[genre.get("name")].length === 5 || !album.get("image")) return;
+      console.log(album.get("image"));
+      $scope.albums[genre.get("name")].push(album);
+    });
+  });
 }])
 .controller("GenresShowCtrl", ["$scope", "$routeParams", "library", "queue", function($scope, $routeParams, library, queue) {
   $scope.genre = library.getGenres({name: $routeParams.genre})[0];

@@ -143,14 +143,18 @@
   <script type="text/ng-template" id="genres/list">
     <h2>Genres</h2>
     <p data-ng-show="!genres.length">No Genres</p>
-    <table class="pure-table pure-table-horizontal" data-ng-show="genres.length" >
-      <thead>
-        <tr><td>Genre</td></tr>
-      </thead>
-      <tbody>
-        <tr data-ng-repeat="genre in genres"><td><a href="#/genre/{{genre.get('name')}}">{{genre.get("name")}}</a></td></tr>
-      </tbody>
-    </table>
+    <ul class="cards" data-ng-show="genres.length">
+      <li data-ng-repeat="genre in (genres | orderBy:orderByName) track by $index" class="card card-genre">
+        <a href="#/genre/{{genre.get('name')}}" title="{{genre.get('name')}}">
+          <div class="img-stack">
+            <img data-ng-src="{{album.get('image')}}" 
+              data-ng-repeat="album in albums[genre.get('name')] track by $index" />
+            <img src="img/default_art.png" data-ng-show="!albums[genre.get('name')].length" class="default-art"/>
+          </div>
+          <p class="title">{{genre.get("name")}}</p>
+        </a>
+      </li>
+    </ul>
   </script>
 
   <script type="text/ng-template" id="genres/show">

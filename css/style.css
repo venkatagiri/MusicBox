@@ -329,9 +329,13 @@ h3 {
   vertical-align: top;
   cursor: pointer;
   text-align: center;
+  box-shadow: 0 0 10px 0 #888;
 }
-.card:hover img {
+.card:hover {
   opacity: 0.8;
+}
+.card:hover a {
+  text-decoration: none;
 }
 .card .title {
   margin: 0 0 5px;
@@ -342,9 +346,32 @@ h3 {
 .card-album {
   width: 174px;
 }
+.card-album img {
+  height: 174px;
+}
 .card-artist {
   width: 126px;
 }
+.card-genre {
+  width: 348px;
+}
+.img-stack {
+  position: relative;
+  height: 174px;
+}
+.img-stack img {
+  position: absolute;
+  width: 174px;
+  height: 174px;
+}
+.img-stack .default-art {
+  left: 25% !important;
+}
+.img-stack img:nth-child(1) { left: 50%; }
+.img-stack img:nth-child(2) { left: 37.5%; }
+.img-stack img:nth-child(3) { left: 25%; }
+.img-stack img:nth-child(4) { left: 12.5%; }
+.img-stack img:nth-child(5) { left: 0; }
 
 .album-image, .artist-image {
   float: left;
