@@ -102,6 +102,7 @@ h3 {
 #nav a:hover, #nav a.active {
   background: #eee;
   text-decoration: none;
+  color: #e62020;
 }
 #nav .pure-menu-heading {
   margin: 0;
