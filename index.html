@@ -2,7 +2,7 @@
 <html data-ng-app="app">
 <head>
   <meta charset=utf-8 />
-  <title>DB Music</title>
+  <title>MusicBox</title>
   <link rel="icon" type="image/png" href="img/favicon-128.png">
   <link rel="stylesheet" href="css/pure-min.css">
   <link rel="stylesheet" href="css/style.css" />
@@ -10,7 +10,7 @@
 <body class="loading" data-ng-controller="MainCtrl">
   <div class="main ng-cloak">
     <header data-ng-show="dropbox.isLoggedIn()">
-      <h1>DB Music</h1>
+      <h1>MusicBox</h1>
       <form class="pure-form search-form" data-ng-submit="search()">
         <input class="search-box" type="text" placeholder="Search music..." data-ng-model="query" data-ng-trim="false" />
       </form>
@@ -210,7 +210,7 @@
   <script type="text/ng-template" id="login">
     <div class="login">
       <img src="img/logo.png" />
-      <div class="title">DB Music</div>
+      <div class="title">MusicBox</div>
       <div class="subtitle">Play tunes from your Dropbox, with Music Library support.</div>
       <button class="pure-button" data-ng-click="login()">Login to Dropbox</button>
       <p data-ng-show="msg">{{msg}}</p>
