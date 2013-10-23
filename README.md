@@ -1,4 +1,4 @@
-# Music Box
+# MusicBox
 
 Play tunes from your Dropbox, with Music Library support.
 

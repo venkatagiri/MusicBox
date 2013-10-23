@@ -60,7 +60,7 @@
           {{song.get("name")}}
           <span data-ng-show="scrobbled" class="scrobbled" title="Scrobbled!">✓</span>
         </div>
-        <div data-col="artist" title="{{song.get('artist')}}">{{song.get("artist")}}</div>
+        <div data-col="artist" title="{{song.get('artist')}}"><a href="#/artist/{{song.get('artist')}}">{{song.get("artist")}}</a></div>
       </div>
     </div>
   </div>
