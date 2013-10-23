@@ -211,6 +211,7 @@ angular
   });
 
   document.addEventListener("keypress", function(e) {
+    if(e.target.classList.contains("search-box")) return;
     if(e.keyCode == 32) {
       if($scope.audio.paused) $scope.play();
       else $scope.pause();
