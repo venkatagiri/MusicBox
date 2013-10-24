@@ -377,6 +377,7 @@ h3 {
 .album-image, .artist-image {
   float: left;
   margin: 0 20px 20px 0;
+  box-shadow: 0 0 10px 0 #888;
 }
 
 /* Page Actions */
