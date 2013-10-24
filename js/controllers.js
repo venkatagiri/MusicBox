@@ -338,7 +338,6 @@ angular
     angular.forEach(library.getAlbums({genre: genre.get("name")}), function(album) {
       if(!$scope.albums[genre.get("name")]) $scope.albums[genre.get("name")] = [];
       if($scope.albums[genre.get("name")].length === 5 || !album.get("image")) return;
-      console.log(album.get("image"));
       $scope.albums[genre.get("name")].push(album);
     });
   });
