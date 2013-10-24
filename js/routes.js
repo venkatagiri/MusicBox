@@ -14,13 +14,13 @@ angular
   .when("/settings", { templateUrl: "settings", controller: "SettingsCtrl", resolve: resolveLibrary })
   .when("/songs", { templateUrl: "songs/list", controller: "SongsListCtrl", resolve: resolveLibrary })
   .when("/albums", { templateUrl: "albums/list", controller: "AlbumsListCtrl", resolve: resolveLibrary })
-  .when("/artist/:artist/album/:album", { templateUrl: "albums/show", controller: "AlbumsShowCtrl", resolve: resolveLibrary })
+  .when("/artist/*artist/album/*album", { templateUrl: "albums/show", controller: "AlbumsShowCtrl", resolve: resolveLibrary })
   .when("/artists", { templateUrl: "artists/list", controller: "ArtistsListCtrl", resolve: resolveLibrary })
-  .when("/artist/:artist", { templateUrl: "artists/show", controller: "ArtistsShowCtrl", resolve: resolveLibrary })
-  .when("/artist/:artist/mixtape", { templateUrl: "artists/mixtape", controller: "ArtistsMixtapeCtrl", resolve: resolveLibrary })
+  .when("/artist/*artist", { templateUrl: "artists/show", controller: "ArtistsShowCtrl", resolve: resolveLibrary })
+  .when("/artist/*artist/mixtape", { templateUrl: "artists/mixtape", controller: "ArtistsMixtapeCtrl", resolve: resolveLibrary })
   .when("/genres", { templateUrl: "genres/list", controller: "GenresListCtrl", resolve: resolveLibrary })
-  .when("/genre/:genre", { templateUrl: "genres/show", controller: "GenresShowCtrl", resolve: resolveLibrary })
+  .when("/genre/*genre", { templateUrl: "genres/show", controller: "GenresShowCtrl", resolve: resolveLibrary })
   .when("/queue", { templateUrl: "queue", controller: "QueueCtrl", resolve: resolveLibrary })
-  .when("/search/:query", { templateUrl: "search", controller: "SearchCtrl", resolve: resolveLibrary })
+  .when("/search/*query", { templateUrl: "search", controller: "SearchCtrl", resolve: resolveLibrary })
   .otherwise({redirectTo: "/queue"});
 }]);
