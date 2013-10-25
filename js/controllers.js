@@ -116,7 +116,7 @@ angular
     $scope.reset_msg = "Resetting...";
     dropbox.reset(function(error) {
       if(error) {
-        $scope.reset_msg = msg;
+        $scope.reset_msg = error;
       } else {
         $scope.reset_msg = "Reset Complete! Scan will continue after reloading the page...";
         location.reload();
