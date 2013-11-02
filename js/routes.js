@@ -20,7 +20,7 @@ angular
   .when("/mixtape/*artist", { templateUrl: "artists/mixtape", controller: "ArtistsMixtapeCtrl", resolve: resolveLibrary })
   .when("/genres", { templateUrl: "genres/list", controller: "GenresListCtrl", resolve: resolveLibrary })
   .when("/genre/*genre", { templateUrl: "genres/show", controller: "GenresShowCtrl", resolve: resolveLibrary })
-  .when("/queue", { templateUrl: "queue", controller: "QueueCtrl", resolve: resolveLibrary })
+  .when("/playlist/*name", { templateUrl: "playlist", controller: "PlaylistCtrl", resolve: resolveLibrary })
   .when("/search/*query", { templateUrl: "search", controller: "SearchCtrl", resolve: resolveLibrary })
-  .otherwise({redirectTo: "/queue"});
+  .otherwise({redirectTo: "/playlist/Queue"});
 }]);

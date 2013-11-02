@@ -178,6 +178,12 @@ angular
       angular.forEach(songs, function(song) {
         songIds.push(song.getId());
       });
+      $rootScope.$broadcast("playlist.change");
+    },
+    deletePlaylist: function(name) {
+      var playlist = playlists.query({name: name})[0];
+      if(playlist) playlist.deleteRecord();
+      $rootScope.$broadcast("playlist.change");
     },
     getQueue: function() {
       return this.getPlaylist("Queue");

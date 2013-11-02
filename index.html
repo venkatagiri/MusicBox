@@ -29,7 +29,8 @@
         <li><a href="#/albums">Albums</a></li>
         <li><a href="#/songs">Songs</a></li>
         <li><a href="#/genres">Genres</a></li>
-        <li><a href="#/queue">Queue</a></li>
+        <li><span class="pure-menu-heading">Playlists</span></li>
+        <li data-ng-repeat="playlist in playlists"><a href="#/playlist/{{playlist.get('name')}}">{{playlist.get('name')}}</a></li>
       </ul>
     </nav>
 
@@ -68,23 +69,19 @@
   <script type="text/ng-template" id="songs/list">
     <h2 data-ng-show="!hideHeading">Songs</h2>
     <p data-ng-show="!songs.length">No Songs</p>
-    <table class="pure-table pure-table-horizontal songs-list" data-ng-show="songs.length">
+    <table class="pure-table pure-table-horizontal songs-list" data-ng-show="songs.length" data-ng-controller="SongsCtrl">
       <thead>
         <tr>
-          <td data-col="index">#</td>
           <td data-col="name">Name</td>
           <td data-col="artist">Artist</td>
           <td data-col="album">Album</td>
         </tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="song in (filteredSongs = (songs | orderBy:orderByName)) track by $index" data-ng-dblclick="play()">
-          <td data-col="index">
-            <span>{{$index+1}}</span>
-            <button data-ng-click="addToQueue(song)" title="Add to Queue" class="add-to-queue">+</button>
-          </td>
+        <tr data-ng-repeat="song in (filteredSongs = (songs | orderBy:orderByName)) track by $index" data-ng-dblclick="play(filteredSongs, $index)">
           <td data-col="name">
-            {{song.get("name")}}
+            <span>{{song.get("name")}}<span>
+            <span data-ng-include="'song-menu'"></span>
           </td>
           <td data-col="artist"><a href="#/artist/{{song.get('artist')}}">{{song.get("artist")}}</a></td>
           <td data-col="album"><a href="#/artist/{{song.get('artist')}}/album/{{song.get('album')}}">{{song.get("album")}}</a></td>
@@ -108,7 +105,7 @@
 
   <script type="text/ng-template" id="albums/show">
     <img data-ng-src="{{album.get('image') || 'img/default_art.png'}}" class="album-image"/>
-    <h2>{{album.get("name")}} <a class="action" data-ng-click="addAlbumToQueue()">+ Add to Queue</a></h2>
+    <h2>{{album.get("name")}} <a class="action" data-ng-click="addToQueue(songs)">+ Add to Queue</a></h2>
     <h3><a href="#/artist/{{album.get('artist')}}">{{album.get("artist")}}</a></h3>
     <div data-ng-include="'songs/list'" data-ng-init="hideHeading=true"></div>
   </script>
@@ -165,27 +162,45 @@
     <div data-ng-include="'songs/list'" data-ng-init="hideHeading=true"></div>
   </script>
 
-  <script type="text/ng-template" id="queue">
-    <h2>Queue <a class="action" data-ng-click="clearQueue()" data-ng-show="songs.length">× Clear Queue</a></h2>
-    <p data-ng-show="!songs.length">The queue is currently empty</p>
-    <table class="pure-table pure-table-horizontal songs-list" data-ng-show="songs.length">
+  <script type="text/ng-template" id="playlist">
+    <h2>
+      <span>{{name}}</span>
+      <a class="action" data-ng-click="addToQueue(songs)" data-ng-show="songs.length && name!='Queue'">+ Add to Queue</a>
+      <a class="action" data-ng-click="clear()" data-ng-show="songs.length">- Clear Playlist</a>
+      <a class="action" data-ng-click="deletePlaylist()" data-ng-show="name!='Queue'">x Remove Playlist</a>
+    </h2>
+    <p data-ng-show="!songs.length">Playlist is currently empty!</p>
+    <table class="pure-table pure-table-horizontal songs-list" data-ng-show="songs.length" data-ng-controller="SongsCtrl">
       <thead>
         <tr>
-          <td data-col="index">#</td>
           <td data-col="name">Name</td>
           <td data-col="artist">Artist</td>
           <td data-col="album">Album</td>
         </tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="song in songs track by $index" data-ng-dblclick="play()" data-ng-class="{selected: $index==nowPlaying}">
-          <td data-col="index">{{$index+1}}</td>
-          <td data-col="name">{{song.get("name")}}</td>
+        <tr data-ng-repeat="song in songs track by $index"
+            data-ng-dblclick="play(songs, $index)"
+            data-ng-class="{selected: name=='Queue' && $index==nowPlaying}">
+          <td data-col="name">
+            <span>{{song.get("name")}}<span>
+            <span data-ng-include="'song-menu'"></span>
+          </td>
           <td data-col="artist"><a href="#/artist/{{song.get('artist')}}">{{song.get("artist")}}</a></td>
           <td data-col="album"><a href="#/artist/{{song.get('artist')}}/album/{{song.get('album')}}">{{song.get("album")}}</a></td>
         </tr>
       </tbody>
     </table>
+  </script>
+
+  <script type="text/ng-template" id="song-menu">
+    <div class="song-menu">
+      <span class="song-menu-item">
+        +
+        <div class="song-menu-item-list" data-menu>
+        </div>
+      </span>
+    </div>
   </script>
 
   <script type="text/ng-template" id="search">

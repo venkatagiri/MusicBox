@@ -50,7 +50,7 @@ angular
 
 .controller("MainCtrl", ["$scope", "$location", "dropbox", "library", function($scope, $location, dropbox, library) {
   if(dropbox.isLoggedIn()) {
-    $scope.$on("datastore.loaded",  function() {
+    $scope.$on("datastore.loaded", function() {
       document.body.classList.remove("loading");
       library.scanDropbox();
     });
@@ -58,6 +58,16 @@ angular
     document.body.classList.remove("loading");
     $location.path("/login");
   }
+
+  // Playlists
+  library.loaded.then(function() {
+    $scope.playlists = library.getPlaylists();
+    $scope.$safeApply();
+    $scope.$on("playlist.change", function() {
+      $scope.playlists = library.getPlaylists();
+      $scope.$safeApply();
+    });
+  });
 
   $scope.dropbox = dropbox;
   $scope.query = "";
@@ -105,7 +115,7 @@ angular
 }])
 
 // Settings
-.controller("SettingsCtrl", ["$scope", "$route", "library", "dropbox", "lastfm", function($scope, $route, library, dropbox, lastfm) {
+.controller("SettingsCtrl", ["$scope", "library", "dropbox", "lastfm", function($scope, library, dropbox, lastfm) {
   $scope.songsCount = library.getAllSongs().length;
   $scope.lastfmName = lastfm.getName();
   
@@ -129,7 +139,7 @@ angular
 }])
 
 // Audio Player
-.controller("PlayerCtrl", ["$scope", "$timeout", "queue", "dropbox", "store", "lastfm", function($scope, $timeout, queue, dropbox, store, lastfm) {
+.controller("PlayerCtrl", ["$scope", "queue", "dropbox", "store", "lastfm", function($scope, queue, dropbox, store, lastfm) {
   $scope.audio = document.querySelector("audio");
   $scope.seekbar = document.querySelector(".seek");
   $scope.seekbar.value = 0;
@@ -230,50 +240,54 @@ angular
   });
 }])
 
+// Songs
+.controller("SongsCtrl", ["$scope", "$window", "queue", "library", function($scope, $window, queue, library) {
+  $scope.play = function(songs, index) {
+    queue.clear();
+    queue.add(songs, index);
+  };
+  $scope.addToPlaylist = function(playlist, song) {
+    var playlistName;
+    if(!playlist.get) {
+      playlistName = $window.prompt("New Playlist Name");
+      if(!playlistName) return $window.alert("Invalid name");
+    } else {
+      playlistName = playlist.get("name");
+    }
+    library.addToPlaylist(playlistName, [song]);
+    $window.alert("Added to "+playlistName);
+  };
+}])
+
+.controller("SongsListCtrl", ["$scope", "library", function($scope, library) {
+  $scope.songs = library.getAllSongs();
+}])
+
+// Playlists
+.controller("PlaylistCtrl", ["$scope", "$location", "$routeParams", "library", "queue", function($scope, $location, $routeParams, library, queue) {
+  $scope.songs = library.getPlaylist($routeParams.name);
+  $scope.name = $routeParams.name;
+
+  $scope.addToQueue = function(songs) {
+    queue.add(songs);
+  };
+  $scope.clear = function() {
+    $scope.songs = [];
+    library.clearPlaylist($scope.name);
+  };
+  $scope.deletePlaylist = function() {
+    $scope.songs = [];
+    library.deletePlaylist($scope.name);
+    $location.path("/playlist/Queue");
+    $scope.$safeApply();
+  };
+}])
+
 // Search
-.controller("SearchCtrl", ["$scope", "$routeParams", "$filter", "library", "queue", function($scope, $routeParams, $filter, library, queue) {
+.controller("SearchCtrl", ["$scope", "$routeParams", "$filter", "library", function($scope, $routeParams, $filter, library) {
   $scope.songs = $filter("song")(library.getAllSongs(), $routeParams.query);
   $scope.albums = $filter("name")(library.getAllAlbums(), $routeParams.query);
   $scope.artists = $filter("name")(library.getAllArtists(), $routeParams.query);
-  
-  $scope.play = function() {
-    queue.clear();
-    queue.add(this.filteredSongs, this.$index);
-  };
-  $scope.addToQueue = function(song) {
-    queue.add([song]);
-  };
-}])
-
-// Songs
-.controller("SongsListCtrl", ["$scope", "queue", "library", function($scope, queue, library) {
-  $scope.songs = library.getAllSongs();
- 
-  $scope.play = function() {
-    queue.clear();
-    queue.add(this.filteredSongs, this.$index);
-  };
-  $scope.addToQueue = function(song) {
-    queue.add([song]);
-  };
-}])
-
-// Queue
-.controller("QueueCtrl", ["$scope", "queue", function($scope, queue) {
-  $scope.songs = queue.songs();
-  $scope.nowPlaying = queue.index();
-
-  $scope.play = function() {
-    queue.play(this.$index);
-  };
-  $scope.$on("queue.song.change", function() {
-    $scope.nowPlaying = queue.index();
-  });
-  $scope.clearQueue = function() {
-    $scope.songs = [];
-    $scope.nowPlaying = -1;
-    queue.clear();
-  };
 }])
 
 //Albums
@@ -284,15 +298,8 @@ angular
   $scope.album = library.getAlbums({name: $routeParams.album, artist: $routeParams.artist})[0];
   $scope.songs = library.getSongs({album: $routeParams.album, artist: $routeParams.artist});
 
-  $scope.play = function() {
-    queue.clear();
-    queue.add(this.filteredSongs, this.$index);
-  };
-  $scope.addToQueue = function(song) {
-    queue.add([song]);
-  };
-  $scope.addAlbumToQueue = function() {
-    queue.add($scope.songs);
+  $scope.addToQueue = function(songs) {
+    queue.add(songs);
   };
 }])
 
@@ -300,34 +307,19 @@ angular
 .controller("ArtistsListCtrl", ["$scope", "library", function($scope, library) {
   $scope.artists = library.getAllArtists();
 }])
-.controller("ArtistsShowCtrl", ["$scope", "$routeParams", "library", "queue", function($scope, $routeParams, library, queue) {
+.controller("ArtistsShowCtrl", ["$scope", "$routeParams", "library", function($scope, $routeParams, library) {
   $scope.artist = library.getArtists({name: $routeParams.artist})[0];
   $scope.albums = library.getAlbums({artist: $routeParams.artist});
   $scope.songs = library.getSongs({artist: $routeParams.artist});
-
-  $scope.play = function() {
-    queue.clear();
-    queue.add(this.filteredSongs, this.$index);
-  };
-  $scope.addToQueue = function(song) {
-    queue.add([song]);
-  };
 }])
-.controller("ArtistsMixtapeCtrl", ["$scope", "$routeParams", "library", "queue", function($scope, $routeParams, library, queue) {
+.controller("ArtistsMixtapeCtrl", ["$scope", "$routeParams", "library", function($scope, $routeParams, library) {
   $scope.artist = library.getArtists({name: $routeParams.artist})[0];
   $scope.songs = library.createMixtape($routeParams.artist);
+
   $scope.songs.then(function() {
     $scope.loaded = true;
     $scope.$safeApply();
   });
-
-  $scope.play = function() {
-    queue.clear();
-    queue.add(this.filteredSongs, this.$index);
-  };
-  $scope.addToQueue = function(song) {
-    queue.add([song]);
-  };
 }])
 
 // Genres
@@ -342,16 +334,8 @@ angular
     });
   });
 }])
-.controller("GenresShowCtrl", ["$scope", "$routeParams", "library", "queue", function($scope, $routeParams, library, queue) {
+.controller("GenresShowCtrl", ["$scope", "$routeParams", "library", function($scope, $routeParams, library) {
   $scope.genre = library.getGenres({name: $routeParams.genre})[0];
   $scope.albums = library.getAlbums({genre: $routeParams.genre});
   $scope.songs = library.getSongs({genre: $routeParams.genre});
-
-  $scope.play = function() {
-    queue.clear();
-    queue.add(this.filteredSongs, this.$index);
-  };
-  $scope.addToQueue = function(song) {
-    queue.add([song]);
-  };
 }]);

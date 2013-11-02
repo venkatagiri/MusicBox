@@ -283,10 +283,47 @@ h3 {
 .songs-list tbody tr {
   border: 0;
   border-bottom: 1px solid #ddd;
-  cursor: pointer;
+  cursor: default;
 }
 .songs-list tbody tr:hover {
   background: #fff;
+}
+.song-menu {
+  display: none;
+}
+.songs-list tbody tr:hover .song-menu {
+  display: inline;
+}
+.song-menu-item {
+  position: relative;
+  padding: 2px 5px;
+  cursor: pointer;
+  z-index: 2;
+}
+.song-menu-item:hover {
+  background: #e0e0e0;
+}
+.song-menu-item .song-menu-item-list {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 150px;
+  background: #fff;
+  z-index: -1;
+  box-shadow: 1px 2px 2px #888;
+}
+.song-menu-item:hover .song-menu-item-list {
+  display: block;
+}
+.song-menu-item-list span {
+  font-size: 80%;
+  padding: 8px 10px;
+  display: block;
+}
+.song-menu-item-list span:hover {
+  text-decoration: none;
+  background: #e0e0e0;
 }
 .songs-list td {
   border: 0;
@@ -295,6 +332,9 @@ h3 {
 .songs-list [data-col=index] {
   width: 25px;
   text-align: center;
+}
+.songs-list [data-col=name] {
+  min-width: 250px;
 }
 .songs-list [data-col=artist], .songs-list [data-col=album] {
   max-width: 250px;
