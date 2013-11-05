@@ -252,11 +252,14 @@
 
     <h3>Last.fm</h3>
     <p data-ng-show="!lastfmName">
-      <button class="pure-button pure-button-primary" data-ng-click="logIntoLastfm()">Login to Last.fm</button>
+      <button class="pure-button pure-button-primary" data-ng-click="lastfmLogin()">Login to Last.fm</button>
       <span>Scrobble the music you listen to.</span>
     </p>
     <p data-ng-show="lastfmName">
-      <span>Scrobbling as <a href="http://www.last.fm/user/{{lastfmName}}" target="_blank">{{lastfmName}}</a>.</span>
+      <span>
+        Scrobbling as <a href="http://www.last.fm/user/{{lastfmName}}" target="_blank">{{lastfmName}}</a> 
+        (<a data-ng-click="lastfmLogout()" href="#/settings">Logout</a>).
+      </span>
     </p>
   </script>
 

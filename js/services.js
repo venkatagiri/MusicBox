@@ -412,6 +412,12 @@ angular
         }
       });
     },
+    logout: function() {
+      settings.remove("lastfm.name");
+      settings.remove("lastfm.key");
+      $route.reload();
+      $rootScope.$safeApply();
+    },
     getName: function() {
       return settings.get("lastfm.name");
     },

@@ -134,8 +134,11 @@ angular
       }
     });
   };
-  $scope.logIntoLastfm = function() {
+  $scope.lastfmLogin = function() {
     lastfm.login();
+  };
+  $scope.lastfmLogout = function() {
+    lastfm.logout();
   };
 }])
 
