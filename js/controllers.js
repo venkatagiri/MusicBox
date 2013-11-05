@@ -269,7 +269,8 @@ angular
 }])
 
 // Playlists
-.controller("PlaylistCtrl", ["$scope", "$location", "$routeParams", "library", "queue", function($scope, $location, $routeParams, library, queue) {
+.controller("PlaylistCtrl", ["$scope", "$location", "$routeParams", "$window", "library", "queue",
+    function($scope, $location, $routeParams, $window, library, queue) {
   $scope.songs = library.getPlaylist($routeParams.name);
   $scope.name = $routeParams.name;
 
@@ -277,10 +278,12 @@ angular
     queue.add(songs);
   };
   $scope.clear = function() {
+    if(!$window.confirm("Are you sure?")) return;
     $scope.songs = [];
     library.clearPlaylist($scope.name);
   };
   $scope.deletePlaylist = function() {
+    if(!$window.confirm("Are you sure?")) return;
     $scope.songs = [];
     library.deletePlaylist($scope.name);
     $location.path("/playlist/Queue");
