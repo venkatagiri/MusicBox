@@ -214,7 +214,7 @@ angular
       if(isScanning) return;
 
       isScanning = true;
-      $rootScope.$broadcast("library.scan.msg", "Searching...");
+      $rootScope.$broadcast("library.scan.msg", "Scanning Dropbox...");
 
       dropbox.search("/", "mp3", {limit: 999}, function(error, files) {
         console.log("Found", files.length, "song(s)");
@@ -228,7 +228,6 @@ angular
         var changed = 0,
           added = 0;
 
-        $rootScope.$broadcast("library.scan.msg", "Scanning...");
         angular.forEach(files, function(file) {
           var song = songs.query({path: file.path})[0];
           if(song && song.get("version") === file.versionTag) return; // If song version has not changed, don't index it again.
