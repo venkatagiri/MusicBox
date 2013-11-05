@@ -115,7 +115,7 @@ angular
 }])
 
 // Settings
-.controller("SettingsCtrl", ["$scope", "library", "dropbox", "lastfm", function($scope, library, dropbox, lastfm) {
+.controller("SettingsCtrl", ["$scope", "$window", "library", "dropbox", "lastfm", function($scope, $window, library, dropbox, lastfm) {
   $scope.songsCount = library.getAllSongs().length;
   $scope.lastfmName = lastfm.getName();
   
@@ -123,6 +123,7 @@ angular
     library.scanDropbox();
   };
   $scope.resetLibrary = function() {
+    if(!$window.confirm("Are you sure you want to reset the music library?")) return;
     $scope.reset_msg = "Resetting...";
     dropbox.reset(function(error) {
       if(error) {
