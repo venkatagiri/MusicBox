@@ -138,6 +138,7 @@ angular
     lastfm.login();
   };
   $scope.lastfmLogout = function() {
+    if(!$window.confirm("Are you sure?")) return;
     lastfm.logout();
   };
 }])
