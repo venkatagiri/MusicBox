@@ -280,6 +280,13 @@ h3 {
 .songs-list thead tr {
   border: 0;
 }
+.songs-list-sortable thead td:hover {
+  background: #fff;
+  cursor: pointer;
+}
+.songs-list-sortable thead td .marker {
+  float: right;
+}
 .songs-list tbody tr {
   border: 0;
   border-bottom: 1px solid #ddd;

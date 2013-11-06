@@ -247,6 +247,7 @@ angular
 
 // Songs
 .controller("SongsCtrl", ["$scope", "$window", "queue", "library", function($scope, $window, queue, library) {
+  $scope.predicate = "name"; // By default, sort by name.
   $scope.play = function(songs, index) {
     queue.clear();
     queue.add(songs, index);

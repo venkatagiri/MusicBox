@@ -69,16 +69,25 @@
   <script type="text/ng-template" id="songs/list">
     <h2 data-ng-show="!hideHeading">Songs</h2>
     <p data-ng-show="!songs.length">No Songs</p>
-    <table class="pure-table pure-table-horizontal songs-list" data-ng-show="songs.length" data-ng-controller="SongsCtrl">
+    <table class="pure-table pure-table-horizontal songs-list songs-list-sortable" data-ng-show="songs.length" data-ng-controller="SongsCtrl">
       <thead>
         <tr>
-          <td data-col="name">Name</td>
-          <td data-col="artist">Artist</td>
-          <td data-col="album">Album</td>
+          <td data-col="name" data-ng-click="predicate='name'" data-ng-class="{selected: predicate=='name'}">
+            <span class="marker" data-ng-show="predicate=='name'">▼</span>
+            <span>Name</span>
+          </td>
+          <td data-col="artist" data-ng-click="predicate='artist'" data-ng-class="{selected: predicate=='artist'}">
+            <span class="marker" data-ng-show="predicate=='artist'">▼</span>
+            <span>Artist</span>
+          </td>
+          <td data-col="album" data-ng-click="predicate='album'" data-ng-class="{selected: predicate=='album'}">
+            <span class="marker" data-ng-show="predicate=='album'">▼</span>
+            <span>Album</span>
+          </td>
         </tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="song in (filteredSongs = (songs | orderObjectBy:'name')) track by $index" data-ng-dblclick="play(filteredSongs, $index)">
+        <tr data-ng-repeat="song in (filteredSongs = (songs | orderObjectBy:predicate)) track by $index" data-ng-dblclick="play(filteredSongs, $index)">
           <td data-col="name">
             <span>{{song.get("name")}}<span>
             <span data-ng-include="'song-menu'"></span>
