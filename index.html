@@ -78,7 +78,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr data-ng-repeat="song in (filteredSongs = (songs | orderBy:orderByName)) track by $index" data-ng-dblclick="play(filteredSongs, $index)">
+        <tr data-ng-repeat="song in (filteredSongs = (songs | orderObjectBy:'name')) track by $index" data-ng-dblclick="play(filteredSongs, $index)">
           <td data-col="name">
             <span>{{song.get("name")}}<span>
             <span data-ng-include="'song-menu'"></span>
@@ -94,7 +94,7 @@
     <h2 data-ng-show="!hideHeading">Albums</h2>
     <p data-ng-show="!albums.length">No Albums</p>
     <ul class="cards" data-ng-show="albums.length">
-      <li data-ng-repeat="album in (albums | orderBy:orderByName) track by $index" class="card card-album">
+      <li data-ng-repeat="album in (albums | orderObjectBy:'name') track by $index" class="card card-album">
         <a href="#/artist/{{album.get('artist')}}/album/{{album.get('name')}}" title="{{album.get('name')}}">
           <img data-ng-src="{{album.get('image') || 'img/default_art.png'}}" />
           <p class="title">{{album.get("name")}}</p>
@@ -114,7 +114,7 @@
     <h2 data-ng-show="!hideHeading">Artists</h2>
     <p data-ng-show="!artists.length">No Artists</p>
     <ul class="cards" data-ng-show="artists.length">
-      <li data-ng-repeat="artist in (artists | orderBy:orderByName) track by $index" class="card card-artist">
+      <li data-ng-repeat="artist in (artists | orderObjectBy:'name') track by $index" class="card card-artist">
         <a href="#/artist/{{artist.get('name')}}" title="{{artist.get('name')}}">
           <img data-ng-src="{{artist.get('image') || 'img/default_art.png'}}" />
           <p class="title">{{artist.get("name")}}</p>
@@ -141,7 +141,7 @@
     <h2>Genres</h2>
     <p data-ng-show="!genres.length">No Genres</p>
     <ul class="cards" data-ng-show="genres.length">
-      <li data-ng-repeat="genre in (genres | orderBy:orderByName) track by $index" class="card card-genre">
+      <li data-ng-repeat="genre in (genres | orderObjectBy:'name') track by $index" class="card card-genre">
         <a href="#/genre/{{genre.get('name')}}" title="{{genre.get('name')}}">
           <div class="img-stack">
             <img data-ng-src="{{album.get('image')}}" 

@@ -24,7 +24,7 @@ angular
     return output;
   };
 })
-.filter('range', function() {
+.filter("range", function() {
   return function(input, total) {
     total = parseInt(total, 10);
     for (var i=0; i<total; i++)
@@ -32,8 +32,18 @@ angular
     return input;
   };
 })
-.run(["$rootScope", function($rootScope) {
-  $rootScope.orderByName = function(record) {
-    return record.get("name");
+.filter("orderObjectBy", function() {
+  return function(items, field, reverse) {
+    var filtered = [];
+    angular.forEach(items, function(item) {
+      filtered.push(item);
+    });
+    filtered.sort(function (a, b) {
+      if(a.get(field) > b.get(field)) return 1;
+      if(a.get(field) < b.get(field)) return -1;
+      return 0;
+    });
+    if(reverse) filtered.reverse();
+    return filtered;
   };
-}]);
+});
