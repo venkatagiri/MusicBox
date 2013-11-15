@@ -119,6 +119,7 @@ angular
     albums = datastore.getTable("albums");
     genres = datastore.getTable("genres");
     playlists = datastore.getTable("playlists");
+    if(playlists.query().length === 0) playlists.insert({name: "Queue", songIds: []}); // If Queue playlist doesn't exist on first login, create it.
     $rootScope.$broadcast("datastore.loaded");
     deferred.resolve();
   });
