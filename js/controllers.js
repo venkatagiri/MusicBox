@@ -261,7 +261,8 @@ angular
     } else {
       playlistName = playlist.get("name");
     }
-    library.addToPlaylist(playlistName, [song]);
+    if(playlistName === "Queue") queue.add([song]);
+    else library.addToPlaylist(playlistName, [song]);
     $window.alert("Added to "+playlistName);
   };
 }])
@@ -282,7 +283,8 @@ angular
   $scope.clear = function() {
     if(!$window.confirm("Are you sure?")) return;
     $scope.songs = [];
-    library.clearPlaylist($scope.name);
+    if($scope.name === "Queue") queue.clear();
+    else library.clearPlaylist($scope.name);
   };
   $scope.deletePlaylist = function() {
     if(!$window.confirm("Are you sure?")) return;
