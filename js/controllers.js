@@ -201,6 +201,7 @@ angular
     $scope.scrobbled = false;
     $scope.progress = 0;
     $scope.song = undefined;
+    $scope.$safeApply();
   });
   
   $scope.audio.addEventListener("canplay", function() {
