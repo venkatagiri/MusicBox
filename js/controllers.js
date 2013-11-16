@@ -50,12 +50,12 @@ angular
 
 .controller("MainCtrl", ["$scope", "$location", "dropbox", "library", function($scope, $location, dropbox, library) {
   if(dropbox.isLoggedIn()) {
+    document.body.classList.add("loading");
     $scope.$on("datastore.loaded", function() {
       document.body.classList.remove("loading");
       library.scanDropbox();
     });
   } else {
-    document.body.classList.remove("loading");
     $location.path("/login");
   }
 

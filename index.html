@@ -7,9 +7,9 @@
   <link rel="stylesheet" href="css/pure-min.css">
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body class="loading" data-ng-controller="MainCtrl">
-  <div class="main ng-cloak">
-    <header data-ng-show="dropbox.isLoggedIn()">
+<body data-ng-controller="MainCtrl">
+  <div class="main">
+    <header data-ng-class="{'logged-in': dropbox.isLoggedIn()}">
       <h1>MusicBox</h1>
       <form class="pure-form search-form" data-ng-submit="search()">
         <input class="search-box" type="text" placeholder="Search music..." data-ng-model="query" data-ng-trim="false" />
@@ -22,7 +22,7 @@
       </div>
     </header>
 
-    <nav class="pure-menu pure-menu-open" id="nav" data-ng-show="dropbox.isLoggedIn()">
+    <nav class="pure-menu pure-menu-open" id="nav" data-ng-class="{'logged-in': dropbox.isLoggedIn()}">
       <ul data-active-link="active">
         <li><span class="pure-menu-heading">Library</span></li>
         <li><a href="#/artists">Artists</a></li>
@@ -35,9 +35,16 @@
     </nav>
 
     <div data-ng-view class="content">
+      <div class="login">
+        <img src="img/logo.png" />
+        <div class="title">MusicBox</div>
+        <div class="subtitle">Play tunes from your Dropbox, with Music Library support.</div>
+        <button class="pure-button" data-ng-click="login()">Login to Dropbox</button>
+        <p data-ng-show="msg" class="ng-cloak">{{msg}}</p>
+      </div>
     </div>
 
-    <div class="player" data-ng-controller="PlayerCtrl" data-ng-show="dropbox.isLoggedIn()">
+    <div class="player" data-ng-controller="PlayerCtrl" data-ng-class="{'logged-in': dropbox.isLoggedIn()}">
       <audio data-ng-src="{{src}}" autoplay></audio>
       <div class="seekbar" data-ng-show="src">
         <input type="range" step="any" class="seek" />

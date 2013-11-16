@@ -32,6 +32,12 @@ a:hover {
 .ng-cloak {
   display: none !important;
 }
+header, nav, .player {
+  display: none;
+}
+.logged-in {
+  display: block;
+}
 
 /* Header */
 header {
