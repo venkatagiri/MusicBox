@@ -191,7 +191,7 @@ angular
     queue.previousSong();
   };
   
-  $scope.$on("queue.song.change",  function() {
+  $scope.$on("queue.song.change", function() {
     var song = queue.currentSong();
     
     console.log("Current Song:", song.get("name"));
@@ -314,6 +314,15 @@ angular
     $location.path("/playlist/Queue");
     $scope.$safeApply();
   };
+
+  // Highlight the now playing song in 'Queue' Playlist
+  if($scope.name === 'Queue') {
+    $scope.nowPlaying = queue.index();
+    $scope.$on("queue.song.change", function() {
+      $scope.nowPlaying = queue.index();
+      $scope.$safeApply();
+    });
+  }
 }])
 
 // Search
