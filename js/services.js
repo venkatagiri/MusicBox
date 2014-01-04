@@ -19,6 +19,18 @@ angular
   });
 }])
 
+// Notification Service
+.service("notification", ["$rootScope", function($rootScope) {
+  return {
+    message: function(message) {
+      $rootScope.$broadcast("notification", {message: message});
+    },
+    stickyMessage: function(message) {
+      $rootScope.$broadcast("notification", {message: message, sticky: true});
+    }
+  };
+}])
+
 // Wrapper service for localStorage, to allow object storage 
 .service("store", function() {
   return {
@@ -39,7 +51,8 @@ angular
 })
 
 // Library Service to build and manage the Music Library
-.service("library", ["$rootScope", "$q", "lastfm", "dropbox", function($rootScope, $q, lastfm, dropbox) {
+.service("library", ["$rootScope", "$q", "lastfm", "dropbox", "settings", "notification", 
+    function($rootScope, $q, lastfm, dropbox, settings, notification) {
   var datastore = false,
     songs, albums, artists, genres, playlists,
     isScanning = false;
@@ -203,14 +216,14 @@ angular
       if(isScanning) return;
 
       isScanning = true;
-      $rootScope.$broadcast("library.scan.msg", "Scanning Dropbox...");
+      notification.stickyMessage("Scanning Dropbox...");
 
       dropbox.search("/", "mp3", {limit: 999}, function(error, files) {
         console.log("Found", files.length, "song(s)");
 
         if(error) {
           console.log(error);
-          $rootScope.$broadcast("library.scan.msg", "Error occured! Try again later.");
+          notification.message("notification", "Error occured! Try again later.");
           return;
         }
 
@@ -224,14 +237,14 @@ angular
           changed++;
           dropbox.getUrl(file.path, function(error, details) {
             if(error) {
-              console.log(error);
+              console.error(error);
               return;
             }
             addSong(file, details.url, function() {
               added++;
-              $rootScope.$broadcast("library.scan.msg", added+" song(s) added/updated!");
+              notification.stickyMessage(added+" song(s) added/updated!");
               if(changed === added) { // We have indexed all the modified songs.
-                $rootScope.$broadcast("library.scan.msg", "Scan Complete! "+added+" song(s) added/updated!");
+                notification.message("Scan Complete! "+added+" song(s) added/updated!");
                 isScanning = false;
               }
             });
@@ -239,7 +252,7 @@ angular
         });
 
         if(changed === 0) {
-          $rootScope.$broadcast("library.scan.msg", "Scan Complete! Everything up-to date!");
+          notification.message("Scan Complete! Library is up-to date!");
           isScanning = false;
         }
       });

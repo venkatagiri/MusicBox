@@ -66,11 +66,6 @@ h3 {
   width: 300px;
   border-radius: 0 !important;
 }
-.scan-msg {
-  float: left;
-  margin: 15px 0 0 20px;
-  font-size: 0.8em;
-}
 
 .links {
   float: right;
@@ -81,6 +76,25 @@ h3 {
 }
 .links a {
   margin-left: 10px;
+}
+
+.notification {
+  position: absolute;
+  top: 56px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 999999999;
+  width: 100%;
+}
+.notification span {
+  margin: 0 auto;
+  font-size: 0.8em;
+  padding: 3px 10px;
+  background: #fef6a8 none no-repeat 20px center;
+  border: 1px solid #fcfc19;
+  color: #e62020;
+  border-radius: 3px 3px;
 }
 
 /* Navigation */

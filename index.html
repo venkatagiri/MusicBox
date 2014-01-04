@@ -15,11 +15,13 @@
       <form class="pure-form search-form" data-ng-submit="search()">
         <input class="search-box" type="text" placeholder="Search music..." data-ng-model="query" data-ng-trim="false" />
       </form>
-      <div class="scan-msg">{{scanMessage}}</div>
       <div class="links">
         <span class="name">{{dropbox.getAccountName()}}</span>
         <a href="#/settings">Settings</a>
         <a href="#/logout">Logout</a>
+      </div>
+      <div class="notification" data-ng-show="notification">
+        <span>{{notification}}</span>
       </div>
     </header>
 

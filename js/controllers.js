@@ -75,10 +75,6 @@ angular
     $location.path("/search/"+$scope.query);
   };
 
-  $scope.$on("library.scan.msg", function(e, msg) {
-    $scope.scanMessage = msg;
-    $scope.$safeApply();
-  });
   $scope.$on("$routeChangeSuccess", function(e, current, previous) {
     if(current.loadedTemplateUrl === "search") {
       $scope.query = current.params.query;
