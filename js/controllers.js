@@ -53,7 +53,12 @@ angular
     document.body.classList.add("loading");
     $scope.$on("datastore.loaded", function() {
       document.body.classList.remove("loading");
-      library.scanDropbox();
+      if(!library.getMusicDirectory()) {
+        $location.path("/settings");
+      } else {
+        $location.path("/playlist/Queue");
+        library.scanDropbox();
+      }
     });
   } else {
     $location.path("/login");
@@ -134,8 +139,8 @@ angular
 }])
 
 // Settings
-.controller("SettingsCtrl", ["$scope", "$window", "library", "dropbox", "lastfm", "notification", 
-    function($scope, $window, library, dropbox, lastfm, notification) {
+.controller("SettingsCtrl", ["$scope", "$window", "library", "dropbox", "lastfm", 
+    function($scope, $window, library, dropbox, lastfm) {
   $scope.songsCount = library.getSongs().length;
   $scope.lastfmName = lastfm.getName();
   $scope.musicDirectory = library.getMusicDirectory();
