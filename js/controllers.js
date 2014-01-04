@@ -108,12 +108,17 @@ angular
     $scope.msg = "Logging In...";
     dropbox.login(function(error) {
       if(error) {
-        console.log(error);
+        console.error(error);
         $scope.msg = "Login Failed. ("+error+")";
       } else {
         $scope.msg = "Login successful! Reticulating Splines now...";
-        $location.path("/queue");
-        library.scanDropbox();
+        if(!library.getMusicDirectory()) {
+          // For the first time login, redirect to Settings page to select their Music Directory.
+          $location.path("/settings");
+        } else {
+          $location.path("/playlist/Queue");
+          library.scanDropbox();
+        }
       }
       $scope.$safeApply();
     });
@@ -129,17 +134,43 @@ angular
 }])
 
 // Settings
-.controller("SettingsCtrl", ["$scope", "$window", "library", "dropbox", "lastfm", function($scope, $window, library, dropbox, lastfm) {
+.controller("SettingsCtrl", ["$scope", "$window", "library", "dropbox", "lastfm", "notification", 
+    function($scope, $window, library, dropbox, lastfm, notification) {
   $scope.songsCount = library.getSongs().length;
   $scope.lastfmName = lastfm.getName();
+  $scope.musicDirectory = library.getMusicDirectory();
   
+  $scope.selectMusicDirectory = function() {
+    if(!$scope.firstTime && !$window.confirm("Changing your music directory would reset your library. Continue?")) return;
+    $scope.showDirectoryList = true;
+    dropbox.getRootDirectories(function(err, dirs) {
+      if(err) return console.error(err);
+      dirs.unshift(""); // Start with root(/) directory which includes the whole Dropbox.
+      $scope.dirs = dirs;
+      $scope.$safeApply();
+    });
+  };
+  $scope.setMusicDirectory = function(dir) {
+    $scope.showDirectoryList = false;
+    if($scope.musicDirectory === dir) return; // Return if the same directory is selected again.
+    library.setMusicDirectory(dir);
+    library.reset(function() {
+      library.scanDropbox();
+    });
+  };
+
+  if(!$scope.musicDirectory) {
+    $scope.firstTime = true;
+    $scope.selectMusicDirectory();
+  }
+
   $scope.scanDropbox = function() {
     library.scanDropbox();
   };
   $scope.resetLibrary = function() {
     if(!$window.confirm("Are you sure you want to reset the music library?")) return;
     $scope.reset_msg = "Resetting...";
-    dropbox.reset(function(error) {
+    library.reset(function(error) {
       if(error) {
         $scope.reset_msg = error;
       } else {

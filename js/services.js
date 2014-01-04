@@ -53,6 +53,7 @@ angular
 // Library Service to build and manage the Music Library
 .service("library", ["$rootScope", "$q", "lastfm", "dropbox", "settings", "notification", 
     function($rootScope, $q, lastfm, dropbox, settings, notification) {
+
   var datastore = false,
     songs, albums, artists, genres, playlists,
     isScanning = false;
@@ -213,17 +214,18 @@ angular
       return defer.promise;
     },
     scanDropbox: function() {
-      if(isScanning) return;
+      if(isScanning || !this.getMusicDirectory()) return;
 
       isScanning = true;
-      notification.stickyMessage("Scanning Dropbox...");
+      notification.stickyMessage("Scanning "+this.getMusicDirectory()+" for Music...");
 
-      dropbox.search("/", "mp3", {limit: 999}, function(error, files) {
+      dropbox.search(this.getMusicDirectory(), "mp3", {limit: 999}, function(error, files) {
         console.log("Found", files.length, "song(s)");
 
         if(error) {
           console.log(error);
-          notification.message("notification", "Error occured! Try again later.");
+          notification.message("Error occured! Try again later.");
+          isScanning = false;
           return;
         }
 
@@ -256,6 +258,15 @@ angular
           isScanning = false;
         }
       });
+    },
+    reset: function(callback) {
+      dropbox.deleteDatastores(callback);
+    },
+    getMusicDirectory: function() {
+      return settings.get("library.musicdirectory");
+    },
+    setMusicDirectory: function(directory) {
+      settings.set("library.musicdirectory", directory);
     }
   };
 }])
@@ -342,11 +353,17 @@ angular
     getUrl: function(path, callback) {
       client.makeUrl(path, {download: true}, callback);
     },
-    reset: function(callback) {
+    deleteDatastores: function(callback) {
       client.getDatastoreManager().deleteDatastore("default", callback);
     },
     getAccountName: function() {
       return this.isLoggedIn() ? store.get("account").name : "";
+    },
+    getRootDirectories: function(callback) {
+      client.readdir('/', function(err, files, rootDirStat, fileStats) {
+        if(err) return callback(err);
+        callback(null, files);
+      });
     }
   };
 }])

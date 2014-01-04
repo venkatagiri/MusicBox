@@ -31,6 +31,18 @@ header, nav, .player {
 .logged-in {
   display: block;
 }
+.mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 999;
+  background: rgba(255, 255, 255, 0.8);
+}
+.mask:first-child {
+  z-index: 1000;
+}
 
 /* Header */
 header {
@@ -136,6 +148,7 @@ h3 {
   right: 0;
   padding: 20px;
   overflow: auto;
+  z-index: 99;
 }
 
 .login {
@@ -171,7 +184,6 @@ h3 {
   background: white;
   padding: 0;
   border-top: 1px solid #ccc;
-  z-index: 99;
 }
 .controls {
   float: left;
@@ -453,4 +465,29 @@ h3 {
 }
 .action:hover {
   text-decoration: none;
+}
+
+/* Music Directory Selector */
+.directory-selector {
+  text-align: center;
+  padding-top: 100px;
+}
+.directory-list {
+  display: inline-block;
+  text-align: left;
+  width: 200px;
+  background: #fff;
+  box-shadow: 1px 2px 2px #888;
+  max-height: 400px;
+  overflow-y: scroll;
+}
+.directory-list span {
+  font-size: 80%;
+  padding: 8px 10px;
+  display: block;
+  cursor: pointer;
+}
+.directory-list span:hover {
+  text-decoration: none;
+  background: #e0e0e0;
 }

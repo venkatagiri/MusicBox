@@ -261,6 +261,17 @@
     <h3>Music Library</h3>
     <p>Songs in your Dropbox: <strong>{{songsCount}}</strong></p>
     <p>
+      <button class="pure-button pure-button-primary" data-ng-click="selectMusicDirectory()">Select Your Music Directory</button>
+      <span>This directory will be scanned for your songs. Currently, it is <strong>{{musicDirectory}}</strong></span>
+    </p>
+    <div data-ng-show="showDirectoryList" class="mask directory-selector">
+      <h3>Pick your music directory</h3>
+      <div class="directory-list">
+        <p data-ng-show="!dirs">Loading...</p>
+        <span data-ng-repeat="dir in dirs" data-ng-click="setMusicDirectory('/'+dir)">/{{dir}}</span>
+      </div>
+    </div>
+    <p>
       <button class="pure-button pure-button-primary" data-ng-click="scanDropbox()">Scan Dropbox</button>
       <span>{{msg || "Finds all audio files in your Dropbox and builds the Music Library."}}</span>
     </p>
