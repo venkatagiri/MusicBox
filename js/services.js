@@ -390,7 +390,7 @@ angular
     },
     get: function(key) {
       var setting = settings.query({key: key})[0];
-      return setting ? setting.get("value") : null;
+      return setting ? setting.get("value") : undefined;
     },
     remove: function(key) {
       var setting = settings.query({key: key})[0];
