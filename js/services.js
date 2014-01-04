@@ -127,29 +127,17 @@ angular
   var deferred = $q.defer();
   return {
     loaded: deferred.promise,
-    getAllSongs: function() {
-      return songs.query();
-    },
-    getAllArtists: function() {
-      return artists.query();
-    },
-    getAllAlbums: function() {
-      return albums.query();
-    },
-    getAllGenres: function() {
-      return genres.query();
-    },
     getArtists: function(params) {
-      return artists.query(params);
+      return artists.query(params || {});
     },
     getAlbums: function(params) {
-      return albums.query(params);
+      return albums.query(params || {});
     },
     getSongs: function(params) {
-      return songs.query(params);
+      return songs.query(params || {});
     },
     getGenres: function(params) {
-      return genres.query(params);
+      return genres.query(params || {});
     },
     getPlaylists: function() {
       return playlists.query();

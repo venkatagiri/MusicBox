@@ -116,7 +116,7 @@ angular
 
 // Settings
 .controller("SettingsCtrl", ["$scope", "$window", "library", "dropbox", "lastfm", function($scope, $window, library, dropbox, lastfm) {
-  $scope.songsCount = library.getAllSongs().length;
+  $scope.songsCount = library.getSongs().length;
   $scope.lastfmName = lastfm.getName();
   
   $scope.scanDropbox = function() {
@@ -268,7 +268,7 @@ angular
 }])
 
 .controller("SongsListCtrl", ["$scope", "library", function($scope, library) {
-  $scope.songs = library.getAllSongs();
+  $scope.songs = library.getSongs();
 }])
 
 // Playlists
@@ -297,14 +297,14 @@ angular
 
 // Search
 .controller("SearchCtrl", ["$scope", "$routeParams", "$filter", "library", function($scope, $routeParams, $filter, library) {
-  $scope.songs = $filter("song")(library.getAllSongs(), $routeParams.query);
-  $scope.albums = $filter("name")(library.getAllAlbums(), $routeParams.query);
-  $scope.artists = $filter("name")(library.getAllArtists(), $routeParams.query);
+  $scope.songs = $filter("song")(library.getSongs(), $routeParams.query);
+  $scope.albums = $filter("name")(library.getAlbums(), $routeParams.query);
+  $scope.artists = $filter("name")(library.getArtists(), $routeParams.query);
 }])
 
 //Albums
 .controller("AlbumsListCtrl", ["$scope", "library", function($scope, library) {
-  $scope.albums = library.getAllAlbums();
+  $scope.albums = library.getAlbums();
 }])
 .controller("AlbumsShowCtrl", ["$scope", "$routeParams", "library", "queue", function($scope, $routeParams, library, queue) {
   $scope.album = library.getAlbums({name: $routeParams.album, artist: $routeParams.artist})[0];
@@ -313,7 +313,7 @@ angular
 
 // Artists
 .controller("ArtistsListCtrl", ["$scope", "library", function($scope, library) {
-  $scope.artists = library.getAllArtists();
+  $scope.artists = library.getArtists();
 }])
 .controller("ArtistsShowCtrl", ["$scope", "$routeParams", "library", function($scope, $routeParams, library) {
   $scope.artist = library.getArtists({name: $routeParams.artist})[0];
@@ -332,7 +332,7 @@ angular
 
 // Genres
 .controller("GenresListCtrl", ["$scope", "library", function($scope, library) {
-  $scope.genres = library.getAllGenres();
+  $scope.genres = library.getGenres();
   $scope.albums = [];
   angular.forEach($scope.genres, function(genre) {
     angular.forEach(library.getAlbums({genre: genre.get("name")}), function(album) {
