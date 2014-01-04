@@ -260,7 +260,12 @@ angular
       });
     },
     reset: function(callback) {
-      dropbox.deleteDatastores(callback);
+      angular.forEach(this.getSongs(), function(song) { song.deleteRecord(); });
+      angular.forEach(this.getArtists(), function(artist) { artist.deleteRecord(); });
+      angular.forEach(this.getAlbums(), function(album) { album.deleteRecord(); });
+      angular.forEach(this.getGenres(), function(genre) { genre.deleteRecord(); });
+      angular.forEach(this.getPlaylists(), function(playlist) { playlist.deleteRecord(); });
+      callback();
     },
     getMusicDirectory: function() {
       return settings.get("library.musicdirectory");
@@ -352,9 +357,6 @@ angular
     },
     getUrl: function(path, callback) {
       client.makeUrl(path, {download: true}, callback);
-    },
-    deleteDatastores: function(callback) {
-      client.getDatastoreManager().deleteDatastore("default", callback);
     },
     getAccountName: function() {
       return this.isLoggedIn() ? store.get("account").name : "";
