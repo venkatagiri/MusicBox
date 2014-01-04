@@ -139,8 +139,8 @@ angular
 }])
 
 // Settings
-.controller("SettingsCtrl", ["$scope", "$window", "library", "dropbox", "lastfm", 
-    function($scope, $window, library, dropbox, lastfm) {
+.controller("SettingsCtrl", ["$scope", "$window", "library", "dropbox", "lastfm", "notification",
+    function($scope, $window, library, dropbox, lastfm, notification) {
   $scope.songsCount = library.getSongs().length;
   $scope.lastfmName = lastfm.getName();
   $scope.musicDirectory = library.getMusicDirectory();
@@ -157,7 +157,9 @@ angular
   };
   $scope.setMusicDirectory = function(dir) {
     $scope.showDirectoryList = false;
-    if($scope.musicDirectory === dir) return; // Return if the same directory is selected again.
+    if($scope.musicDirectory === dir)
+      return notification.message("Please select a different directory."); // Return if the same directory is selected again.
+    
     library.setMusicDirectory(dir);
     library.reset(function() {
       library.scanDropbox();
