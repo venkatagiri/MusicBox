@@ -187,7 +187,11 @@ angular
     $scope.scrobbled = false;
     
     dropbox.getUrl(song.get('path'), function(error, details) {
-      if(error) return console.log(error);
+      if(error) {
+        console.error(error);
+        $scope.next(); // If an error occurs while fetching the URL of the song, play the next song.
+        return;
+      }
       
       $scope.src = details.url;
       $scope.$safeApply();
@@ -209,7 +213,10 @@ angular
     $scope.seekbar.max = $scope.audio.duration;
   }, false);
   $scope.audio.addEventListener("ended", function() {
-    $scope.next(); // When audio ends, play next song in Queue.
+    $scope.next(); // When audio ends, play the next song.
+  }, false);
+  $scope.audio.addEventListener("error", function() {
+    $scope.next(); // If an error occurs while playing the song, play the next song.
   }, false);
   $scope.audio.addEventListener("timeupdate", function() {
     $scope.seekbar.value = $scope.audio.currentTime;
