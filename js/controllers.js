@@ -82,6 +82,24 @@ angular
       $scope.query = "";
     }
   });
+
+  // Notification Messages
+  var notificationTimeoutId;
+  $scope.$on("notification", function(e, params) {
+    if(notificationTimeoutId) {
+      clearTimeout(notificationTimeoutId);
+      notificationTimeoutId = undefined;
+    }
+    $scope.notification = params.message;
+    $scope.$safeApply();
+
+    if(!params.sticky) {
+      notificationTimeoutId = setTimeout(function() {
+        $scope.notification = "";
+        $scope.$safeApply();
+      }, 3000);
+    }
+  });
 }])
 
 // Login
