@@ -309,10 +309,6 @@ angular
 .controller("AlbumsShowCtrl", ["$scope", "$routeParams", "library", "queue", function($scope, $routeParams, library, queue) {
   $scope.album = library.getAlbums({name: $routeParams.album, artist: $routeParams.artist})[0];
   $scope.songs = library.getSongs({album: $routeParams.album, artist: $routeParams.artist});
-
-  $scope.addToQueue = function(songs) {
-    queue.add(songs);
-  };
 }])
 
 // Artists

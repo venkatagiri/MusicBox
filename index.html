@@ -122,7 +122,7 @@
 
   <script type="text/ng-template" id="albums/show">
     <img data-ng-src="{{album.get('image') || 'img/default_art.png'}}" class="album-image"/>
-    <h2>{{album.get("name")}} <a class="action" data-ng-click="addToQueue(songs)">+ Add to Queue</a></h2>
+    <h2>{{album.get("name")}}</h2>
     <h3><a href="#/artist/{{album.get('artist')}}">{{album.get("artist")}}</a></h3>
     <div data-ng-include="'songs/list'" data-ng-init="hideHeading=true"></div>
   </script>
