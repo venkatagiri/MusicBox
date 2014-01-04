@@ -362,9 +362,13 @@ angular
       return this.isLoggedIn() ? store.get("account").name : "";
     },
     getRootDirectories: function(callback) {
-      client.readdir('/', function(err, files, rootDirStat, fileStats) {
+      client.readdir('/', function(err, files, rootDirStat, entries) {
         if(err) return callback(err);
-        callback(null, files);
+        var directories = [];
+        angular.forEach(entries, function(entry) {
+          if(entry.isFolder) directories.push(entry.path);
+        });
+        callback(null, directories);
       });
     }
   };

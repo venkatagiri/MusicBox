@@ -268,7 +268,7 @@
       <h3>Pick your music directory</h3>
       <div class="directory-list">
         <p data-ng-show="!dirs">Loading...</p>
-        <span data-ng-repeat="dir in dirs" data-ng-click="setMusicDirectory('/'+dir)">/{{dir}}</span>
+        <span data-ng-repeat="dir in dirs" data-ng-click="setMusicDirectory(dir)">{{dir}}</span>
       </div>
     </div>
     <p>

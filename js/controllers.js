@@ -150,7 +150,7 @@ angular
     $scope.showDirectoryList = true;
     dropbox.getRootDirectories(function(err, dirs) {
       if(err) return console.error(err);
-      dirs.unshift(""); // Start with root(/) directory which includes the whole Dropbox.
+      dirs.unshift("/"); // Start with root(/) directory which includes the whole Dropbox.
       $scope.dirs = dirs;
       $scope.$safeApply();
     });
