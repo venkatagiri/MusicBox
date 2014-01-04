@@ -340,7 +340,7 @@ h3 {
   text-align: center;
 }
 .songs-list [data-col=name] {
-  min-width: 250px;
+  min-width: 300px;
 }
 .songs-list [data-col=artist], .songs-list [data-col=album] {
   max-width: 250px;
