@@ -163,6 +163,8 @@ angular
 
     library.setMusicDirectory(dir);
     library.reset(function() {
+      $scope.musicDirectory = dir;
+      $scope.$safeApply();
       library.scanDropbox();
     });
   };
