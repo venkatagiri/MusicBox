@@ -148,6 +148,7 @@ angular
   $scope.selectMusicDirectory = function() {
     if(!$scope.firstTime && !$window.confirm("Changing your music directory would reset your library. Continue?")) return;
     $scope.showDirectoryList = true;
+    $scope.dirs = undefined;
     dropbox.getRootDirectories(function(err, dirs) {
       if(err) return console.error(err);
       dirs.unshift("/"); // Start with root(/) directory which includes the whole Dropbox.
@@ -159,7 +160,7 @@ angular
     $scope.showDirectoryList = false;
     if($scope.musicDirectory === dir)
       return notification.message("Please select a different directory."); // Return if the same directory is selected again.
-    
+
     library.setMusicDirectory(dir);
     library.reset(function() {
       library.scanDropbox();
