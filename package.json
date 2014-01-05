@@ -1,0 +1,25 @@
+{
+  "name": "MusicBox",
+  "version": "0.1.17",
+  "description": "Play tunes from your Dropbox, with Music Library support.",
+  "main": "index.html",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/venkatagiri/MusicBox.git"
+  },
+  "keywords": [
+    "music",
+    "dropbox",
+    "player",
+    "library"
+  ],
+  "author": "Venkata Giri Reddy",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-usemin": "~2.0.2",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-cssmin": "~0.7.0",
+    "grunt-contrib-copy": "~0.5.0"
+  }
+}
