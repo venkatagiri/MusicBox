@@ -309,7 +309,8 @@ angular
 }])
 
 // Songs
-.controller("SongsCtrl", ["$scope", "$window", "queue", "library", function($scope, $window, queue, library) {
+.controller("SongsCtrl", ["$scope", "$window", "queue", "library", "notification",
+    function($scope, $window, queue, library, notification) {
   $scope.predicate = "name"; // By default, sort by name.
   $scope.play = function(songs, index) {
     queue.clear();
@@ -319,13 +320,13 @@ angular
     var playlistName;
     if(!playlist.get) {
       playlistName = $window.prompt("New Playlist Name");
-      if(!playlistName) return $window.alert("Invalid name");
+      if(!playlistName) return notification.message("Invalid Name!");
     } else {
       playlistName = playlist.get("name");
     }
     if(playlistName === "Queue") queue.add([song]);
     else library.addToPlaylist(playlistName, [song]);
-    $window.alert("Added to "+playlistName);
+    notification.message("Added to "+playlistName);
   };
 }])
 
