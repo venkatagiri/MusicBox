@@ -184,7 +184,7 @@ h3 {
   background: white;
   padding: 0;
   border-top: 1px solid #ccc;
-  z-index: 9;
+  z-index: 999;
 }
 .controls {
   float: left;
