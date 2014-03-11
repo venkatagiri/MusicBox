@@ -14,7 +14,7 @@ angular
   $rootScope.$on('$routeChangeSuccess', function() {
     $window.ga('send', 'pageview', {
       location: $location.absUrl(),
-      page: $location.url()
+      page: '/MusicBox' + $location.url()
     });
   });
 }])
