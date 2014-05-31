@@ -267,7 +267,7 @@
       <button class="pure-button pure-button-primary" data-ng-click="selectMusicDirectory()">Select Your Music Directory</button>
       <span>This directory will be scanned for your songs. Currently, it is <strong>{{musicDirectory}}</strong></span>
     </p>
-    <div data-ng-show="showDirectoryList" class="mask directory-selector">
+    <div data-ng-show="showDirectoryList" data-ng-click="showDirectoryList=false" class="mask directory-selector">
       <h3>Pick your music directory</h3>
       <div class="directory-list">
         <p data-ng-show="!dirs">Loading...</p>
