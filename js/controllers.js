@@ -199,7 +199,8 @@ angular
 }])
 
 // Audio Player
-.controller("PlayerCtrl", ["$scope", "queue", "dropbox", "store", "lastfm", function($scope, queue, dropbox, store, lastfm) {
+.controller("PlayerCtrl", ["$scope", "queue", "dropbox", "store", "lastfm", "library", 
+    function($scope, queue, dropbox, store, lastfm, library) {
   $scope.audio = document.querySelector("audio");
   $scope.seekbar = document.querySelector(".seek");
   $scope.seekbar.value = 0;
@@ -244,6 +245,7 @@ angular
     dropbox.getUrl(song.get('path'), function(error, details) {
       if(error) {
         console.error(error);
+        if(error.status === 404) library.removeSong(song); // If the song is missing from DB, remove it from the library.
         $scope.next(); // If an error occurs while fetching the URL of the song, play the next song.
         return;
       }

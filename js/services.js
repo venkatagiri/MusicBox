@@ -58,21 +58,25 @@ angular
     songs, albums, artists, genres, playlists,
     isScanning = false;
   
+  function removeSong(song) {
+    if(songs.query({artist: song.get("artist")}).length === 1) {
+      artists.query({name: song.get("artist")})[0].deleteRecord();
+    }
+    if(songs.query({album: song.get("album")}).length === 1) {
+      albums.query({name: song.get("album")})[0].deleteRecord();
+    }
+    if(songs.query({genre: song.get("genre")}).length === 1) {
+      genres.query({name: song.get("genre")})[0].deleteRecord();
+    }
+    song.deleteRecord();
+  }
+
   function addSong(file, url, callback) {
     var song = songs.query({path: file.path})[0];
 
     // Song already exists. Delete older entries before song is added again.
     if(song) {
-      if(songs.query({artist: song.get("artist")}).length === 1) {
-        artists.query({name: song.get("artist")})[0].deleteRecord();
-      }
-      if(songs.query({album: song.get("album")}).length === 1) {
-        albums.query({name: song.get("album")})[0].deleteRecord();
-      }
-      if(songs.query({genre: song.get("genre")}).length === 1) {
-        genres.query({name: song.get("genre")})[0].deleteRecord();
-      }
-      song.deleteRecord();
+      removeSong(song);
     }
 
     ID3.loadTags(url, file.size, function() {
@@ -212,6 +216,9 @@ angular
       });
 
       return defer.promise;
+    },
+    removeSong: function(song) {
+      removeSong(song);
     },
     scanDropbox: function() {
       if(isScanning || !this.getMusicDirectory()) return;
