@@ -130,6 +130,22 @@ angular
     }, { tags: ["artist", "title", "album", "genre"] });
   }
 
+  function cleanup(files) {
+    var filePaths = [],
+        allSongs = songs.query({});
+
+    angular.forEach(files, function(file) {
+      filePaths.push(file.path);
+    });
+
+    angular.forEach(allSongs, function(song) {
+      if(filePaths.indexOf(song.get("path")) < 0) {
+        console.log("File", song.get("path"), "is deleted!");
+        removeSong(song);
+      }
+    });
+  }
+
   dropbox.datastoreLoaded.then(function(ds) {
     window.ds = datastore = ds;
     songs = datastore.getTable("songs");
@@ -255,6 +271,7 @@ angular
               if(changed === added) { // We have indexed all the modified songs.
                 notification.message("Scan Complete! "+added+" song(s) added/updated!");
                 isScanning = false;
+                cleanup(files);
               }
             });
           });
@@ -263,6 +280,7 @@ angular
         if(changed === 0) {
           notification.message("Scan Complete! Library is up-to date!");
           isScanning = false;
+          cleanup(files);
         }
       });
     },
